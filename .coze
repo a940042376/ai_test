@@ -3,8 +3,8 @@ requires = ["nodejs-22"]
 
 [dev]
 build = ["pnpm", "install"]
-run = ["pnpm", "server"]
+run = ["node", "--import", "tsx/esm", "server/index.ts"]
 
 [deploy]
 build = ["pnpm", "install"]
-run = ["pnpm", "server"]
+run = ["node", "--import", "tsx/esm", "server/index.ts"]
