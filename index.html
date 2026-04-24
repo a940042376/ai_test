@@ -10,42 +10,62 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
     .header { background: #fff; border-bottom: 1px solid #ddd; padding: 16px 24px; }
     .header h1 { font-size: 18px; color: #333; font-weight: 500; }
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
-    .panel { background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
-    .panel-header { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
-    .editor { height: 320px; background: #282c34; }
+    .container { max-width: 1600px; margin: 0 auto; padding: 20px 24px; }
+    .panel { background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .panel-header { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; display: flex; align-items: center; justify-content: space-between; }
+    .search-bar { padding: 12px 16px; border-bottom: 1px solid #eee; display: flex; gap: 12px; }
+    .search-bar .el-input { width: 300px; }
+    .file-list { max-height: 400px; overflow-y: auto; }
+    .file-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center; gap: 10px; }
+    .file-item:hover { background: #fafafa; }
+    .file-item.active { background: #e6f4ff; }
+    .file-icon { width: 32px; height: 32px; border-radius: 4px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-size: 14px; }
+    .file-icon.java { background: #ffeeba; color: #e6a23c; }
+    .file-icon.sql { background: #e6f4ff; color: #409eff; }
+    .file-info { flex: 1; }
+    .file-name { font-size: 13px; color: #333; }
+    .file-path { font-size: 11px; color: #999; margin-top: 2px; }
+    .file-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .badge-error { background: #fef0f0; color: #f56c6c; }
+    .badge-success { background: #f0f9eb; color: #67c23a; }
+    .editor { height: 200px; background: #282c34; }
     .editor textarea { width: 100%; height: 100%; padding: 16px; border: none; resize: none; font-family: monospace; font-size: 13px; line-height: 1.5; background: #282c34; color: #abb2bf; }
     .editor textarea:focus { outline: none; }
     .footer { padding: 12px 16px; border-top: 1px solid #eee; }
     .summary { display: flex; gap: 16px; margin-bottom: 16px; }
-    .summary-item { background: #fff; padding: 16px 24px; border-radius: 4px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .summary-item { background: #fff; padding: 16px 24px; border-radius: 4px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex: 1; }
     .summary-item .num { font-size: 28px; font-weight: 600; }
-    .summary-item .label { font-size: 12px; color: #999; }
+    .summary-item .label { font-size: 12px; color: #999; margin-top: 4px; }
     .num-error { color: #e74c3c; }
     .num-warn { color: #f39c12; }
     .num-info { color: #3498db; }
     .issue { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
     .issue:last-child { border-bottom: none; }
-    .issue-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .issue-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .issue-header { display: flex; align-items: flex-start; gap: 10px; }
+    .issue-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
     .icon-error { background: #ffeaea; color: #e74c3c; }
     .icon-warn { background: #fff8e6; color: #f39c12; }
     .icon-info { background: #e6f4ff; color: #3498db; }
-    .issue-msg { font-size: 14px; color: #333; margin-bottom: 4px; }
-    .issue-sug { font-size: 12px; color: #999; }
-    .diff { margin-top: 12px; padding: 12px; background: #1e1e1e; border-radius: 4px; }
-    .diff-before { color: #e74c3c; font-size: 12px; margin-bottom: 8px; }
-    .diff-after { color: #2ecc71; font-size: 12px; }
-    .diff pre { font-family: monospace; margin-top: 4px; color: #ccc; white-space: pre-wrap; }
+    .issue-content { flex: 1; }
+    .issue-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .issue-msg { font-size: 14px; color: #333; }
+    .issue-sug { font-size: 12px; color: #999; margin-top: 4px; }
     .tag { padding: 2px 8px; border-radius: 3px; font-size: 11px; }
     .tag-error { background: #ffeaea; color: #e74c3c; }
     .tag-warn { background: #fff8e6; color: #f39c12; }
     .tag-info { background: #e6f4ff; color: #3498db; }
+    .tag-category { background: #f5f5f5; color: #666; }
     .line-num { color: #999; font-size: 12px; }
-    .file-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f5; }
-    .file-item:hover { background: #fafafa; }
-    .file-item.active { background: #e6f4ff; }
-    .file-name { font-size: 13px; color: #333; }
+    .diff { margin-top: 10px; padding: 10px; background: #1e1e1e; border-radius: 4px; }
+    .diff-before { color: #e74c3c; font-size: 12px; margin-bottom: 6px; }
+    .diff-after { color: #2ecc71; font-size: 12px; }
+    .diff pre { font-family: monospace; margin-top: 4px; color: #ccc; white-space: pre-wrap; word-break: break-all; }
+    .empty-state { padding: 60px; text-align: center; color: #999; }
+    .empty-state i { font-size: 48px; color: #ddd; margin-bottom: 16px; }
+    .pagination { padding: 12px 16px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; }
+    .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #282c34; }
+    .code-preview pre { font-family: monospace; font-size: 12px; color: #abb2bf; white-space: pre-wrap; margin: 0; }
+    .results-container { margin-top: 16px; }
   </style>
 </head>
 <body>
@@ -55,113 +75,232 @@
     </div>
     <div class="container">
       <el-tabs v-model="activeTab">
-        <el-tab-pane label="代码输入" name="code"></el-tab-pane>
+        <el-tab-pane label="代码扫描" name="code"></el-tab-pane>
         <el-tab-pane label="文件夹扫描" name="folder"></el-tab-pane>
       </el-tabs>
 
-      <el-row :gutter="20">
-        <el-col :span="mode === 'code' ? 24 : 10">
-          <!-- 代码输入模式 -->
-          <div v-if="mode === 'code'" class="panel">
-            <div class="panel-header">
-              <span>输入代码</span>
-              <el-select v-model="language" size="small" style="width: 100px">
-                <el-option label="Java" value="java"></el-option>
-                <el-option label="MySQL" value="mysql"></el-option>
-              </el-select>
-            </div>
-            <div class="editor">
-              <textarea v-model="codeContent" :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'" spellcheck="false"></textarea>
-            </div>
-            <div class="footer">
-              <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">
-                {{ analyzing ? '分析中...' : '开始审查' }}
-              </el-button>
-              <el-button @click="loadSample">加载示例</el-button>
-            </div>
-          </div>
+      <!-- 代码扫描 -->
+      <div v-if="mode === 'code'" class="panel">
+        <div class="panel-header">
+          <span>输入代码</span>
+          <el-select v-model="language" size="small" style="width: 100px">
+            <el-option label="Java" value="java"></el-option>
+            <el-option label="MySQL" value="mysql"></el-option>
+          </el-select>
+        </div>
+        <div class="editor">
+          <textarea v-model="codeContent" :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'" spellcheck="false"></textarea>
+        </div>
+        <div class="footer">
+          <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">
+            {{ analyzing ? '扫描中...' : '开始扫描' }}
+          </el-button>
+          <el-button @click="loadSample">加载示例</el-button>
+        </div>
+      </div>
 
-          <!-- 文件夹模式 -->
-          <div v-else class="panel">
-            <div class="panel-header">
-              <span>文件列表</span>
-              <el-button size="small" @click="selectFolder">选择文件夹</el-button>
-              <input ref="folderInput" type="file" webkitdirectory multiple style="display:none" @change="handleFolderSelect">
-            </div>
-            <div v-if="fileList.length === 0" style="padding: 40px; text-align: center; color: #999;">
-              选择包含 Java 或 SQL 文件的文件夹
-            </div>
-            <div v-else>
-              <div v-for="file in fileList" :key="file.path" class="file-item" :class="{ active: selectedFile === file.path }" @click="selectFile(file)">
-                <span class="file-name">{{ file.name }}</span>
-                <span v-if="results[file.path]" style="margin-left: 8px; font-size: 12px;" :style="{ color: results[file.path].total > 0 ? '#e74c3c' : '#2ecc71' }">
-                  {{ results[file.path].total }} 问题
-                </span>
+      <!-- 文件夹扫描 -->
+      <div v-else>
+        <div class="panel" style="margin-bottom: 16px;">
+          <div class="panel-header">
+            <span>文件列表 ({{ filteredFiles.length }} 个文件)</span>
+            <el-button size="small" @click="selectFolder">
+              <i class="el-icon-folder-opened"></i> 选择文件夹
+            </el-button>
+            <input ref="folderInput" type="file" webkitdirectory multiple style="display:none" @change="handleFolderSelect">
+          </div>
+          <div class="search-bar" v-if="fileList.length > 0">
+            <el-input v-model="fileSearch" placeholder="搜索文件名..." prefix-icon="el-icon-search" clearable></el-input>
+            <el-select v-model="filterType" size="small" style="width: 120px" clearable placeholder="文件类型">
+              <el-option label="全部" value=""></el-option>
+              <el-option label="Java" value="java"></el-option>
+              <el-option label="SQL" value="sql"></el-option>
+            </el-select>
+          </div>
+          <div v-if="fileList.length === 0" class="empty-state">
+            <i class="el-icon-folder-opened"></i>
+            <p>选择包含 Java 或 SQL 文件的文件夹</p>
+          </div>
+          <div v-else class="file-list">
+            <div v-for="file in paginatedFiles" :key="file.path" class="file-item" :class="{ active: selectedFile === file.path }" @click="selectFile(file)">
+              <div class="file-icon" :class="file.name.endsWith('.sql') ? 'sql' : 'java'">
+                {{ file.name.endsWith('.sql') ? 'SQL' : 'J' }}
               </div>
-            </div>
-            <div v-if="fileList.length > 0" class="footer">
-              <el-button type="primary" :loading="analyzing" @click="analyzeFolder">
-                {{ analyzing ? '分析中...' : '开始审查' }}
-              </el-button>
+              <div class="file-info">
+                <div class="file-name">{{ file.name }}</div>
+                <div class="file-path">{{ file.path }}</div>
+              </div>
+              <span v-if="results[file.path]" class="file-badge" :class="results[file.path].total > 0 ? 'badge-error' : 'badge-success'">
+                {{ results[file.path].total > 0 ? results[file.path].total + ' 问题' : '通过' }}
+              </span>
             </div>
           </div>
-        </el-col>
+          <div class="pagination" v-if="filteredFiles.length > pageSize">
+            <el-pagination
+              @current-change="filePageChange"
+              :current-page="filePage"
+              :page-size="pageSize"
+              :total="filteredFiles.length"
+              layout="prev, pager, next">
+            </el-pagination>
+          </div>
+          <div class="footer" v-if="fileList.length > 0">
+            <el-button type="primary" :loading="analyzing" @click="analyzeAll">
+              {{ analyzing ? '扫描中...' : '开始扫描全部 (' + fileList.length + ')' }}
+            </el-button>
+            <span style="margin-left: 16px; color: #999; font-size: 13px;" v-if="scannedCount > 0">
+              已扫描: {{ scannedCount }}/{{ fileList.length }}
+            </span>
+          </div>
+        </div>
 
-        <el-col :span="mode === 'code' ? 24 : 14">
+        <!-- 选中文件的代码预览 -->
+        <div v-if="selectedFile && selectedFileContent" class="panel" style="margin-bottom: 16px;">
+          <div class="panel-header">
+            <span>{{ selectedFileName }}</span>
+            <el-tag size="small" :type="selectedFile.endsWith('.sql') ? 'primary' : 'warning'">
+              {{ selectedFile.endsWith('.sql') ? 'MySQL' : 'Java' }}
+            </el-tag>
+          </div>
+          <div class="code-preview">
+            <pre>{{ selectedFileContent }}</pre>
+          </div>
+        </div>
+
+        <!-- 扫描结果 -->
+        <div class="results-container">
           <!-- 统计 -->
-          <div v-if="currentSummary && currentSummary.total > 0" class="summary">
+          <div v-if="totalSummary && totalSummary.total > 0" class="summary">
             <div class="summary-item">
-              <div class="num">{{ currentSummary.total }}</div>
-              <div class="label">总数</div>
+              <div class="num">{{ totalSummary.total }}</div>
+              <div class="label">问题总数</div>
             </div>
             <div class="summary-item">
-              <div class="num num-error">{{ currentSummary.errors }}</div>
+              <div class="num num-error">{{ totalSummary.errors }}</div>
               <div class="label">错误</div>
             </div>
             <div class="summary-item">
-              <div class="num num-warn">{{ currentSummary.warnings }}</div>
+              <div class="num num-warn">{{ totalSummary.warnings }}</div>
               <div class="label">警告</div>
             </div>
             <div class="summary-item">
-              <div class="num num-info">{{ currentSummary.suggestions }}</div>
+              <div class="num num-info">{{ totalSummary.suggestions }}</div>
               <div class="label">建议</div>
             </div>
           </div>
 
-          <!-- 结果列表 -->
-          <div v-if="currentIssues.length > 0" class="panel">
-            <div class="panel-header">审查结果 ({{ currentIssues.length }})</div>
-            <div v-for="(issue, index) in currentIssues" :key="index" class="issue">
-              <div class="issue-header">
-                <div class="issue-icon" :class="'icon-' + issue.severity">
-                  <span v-if="issue.severity === 'error'">✕</span>
-                  <span v-else-if="issue.severity === 'warning'">!</span>
-                  <span v-else>ℹ</span>
+          <!-- 结果搜索 -->
+          <div v-if="allResults.length > 0" class="panel">
+            <div class="panel-header">
+              <span>扫描结果 ({{ filteredResults.length }} 条)</span>
+              <el-input v-model="resultSearch" placeholder="搜索问题内容..." prefix-icon="el-icon-search" size="small" style="width: 250px;" clearable></el-input>
+            </div>
+            <div v-if="filteredResults.length === 0" class="empty-state">
+              <p>未找到匹配的问题</p>
+            </div>
+            <div v-else>
+              <div v-for="(issue, index) in paginatedResults" :key="index" class="issue">
+                <div class="issue-header">
+                  <div class="issue-icon" :class="'icon-' + issue.severity">
+                    <span v-if="issue.severity === 'error'">✕</span>
+                    <span v-else-if="issue.severity === 'warning'">!</span>
+                    <span v-else>ℹ</span>
+                  </div>
+                  <div class="issue-content">
+                    <div class="issue-meta">
+                      <span class="tag" :class="'tag-' + issue.severity">{{ issue.severity === 'error' ? '错误' : issue.severity === 'warning' ? '警告' : '建议' }}</span>
+                      <span class="line-num">{{ issue.file }}</span>
+                      <span class="line-num">行 {{ issue.line }}</span>
+                      <span class="tag tag-category">{{ issue.category }}</span>
+                    </div>
+                    <div class="issue-msg">{{ issue.message }}</div>
+                    <div class="issue-sug">{{ issue.suggestion }}</div>
+                    <div v-if="issue.beforeCode" class="diff">
+                      <div class="diff-before">修改前: <pre>{{ issue.beforeCode }}</pre></div>
+                      <div class="diff-after">修改后: <pre>{{ issue.afterCode }}</pre></div>
+                    </div>
+                  </div>
                 </div>
-                <span class="tag" :class="'tag-' + issue.severity">{{ issue.severity === 'error' ? '错误' : issue.severity === 'warning' ? '警告' : '建议' }}</span>
-                <span class="line-num">行 {{ issue.line }}</span>
-                <span class="tag" style="background: #f5f5f5; color: #666;">{{ issue.category }}</span>
               </div>
-              <div class="issue-msg">{{ issue.message }}</div>
-              <div class="issue-sug">{{ issue.suggestion }}</div>
-              <div v-if="issue.beforeCode" class="diff">
-                <div class="diff-before">修改前: <pre>{{ issue.beforeCode }}</pre></div>
-                <div class="diff-after">修改后: <pre>{{ issue.afterCode }}</pre></div>
-              </div>
+            </div>
+            <div class="pagination" v-if="filteredResults.length > resultPageSize">
+              <el-pagination
+                @current-change="resultPageChange"
+                :current-page="resultPage"
+                :page-size="resultPageSize"
+                :total="filteredResults.length"
+                layout="prev, pager, next">
+              </el-pagination>
             </div>
           </div>
 
-          <div v-if="showSuccess" class="panel" style="padding: 40px; text-align: center;">
-            <div style="font-size: 48px; color: #2ecc71; margin-bottom: 16px;">✓</div>
-            <div style="font-size: 16px; color: #333;">审查通过</div>
-            <div style="font-size: 13px; color: #999; margin-top: 8px;">未发现问题</div>
+          <div v-if="fileList.length > 0 && !analyzing && allResults.length === 0 && scannedCount === fileList.length" class="panel">
+            <div style="padding: 40px; text-align: center;">
+              <div style="font-size: 48px; color: #2ecc71; margin-bottom: 16px;">✓</div>
+              <div style="font-size: 16px; color: #333;">扫描完成，未发现问题</div>
+            </div>
           </div>
 
-          <div v-if="!currentIssues.length && !showSuccess" class="panel" style="padding: 60px; text-align: center; color: #999;">
-            输入代码开始审查
+          <div v-if="fileList.length === 0" class="panel empty-state">
+            <i class="el-icon-folder-opened"></i>
+            <p>选择文件夹开始扫描</p>
           </div>
-        </el-col>
-      </el-row>
+        </div>
+      </div>
+
+      <!-- 代码扫描结果 -->
+      <div v-if="mode === 'code' && singleResult && singleResult.issues.length > 0" class="results-container">
+        <div class="summary">
+          <div class="summary-item">
+            <div class="num">{{ singleResult.summary.total }}</div>
+            <div class="label">问题总数</div>
+          </div>
+          <div class="summary-item">
+            <div class="num num-error">{{ singleResult.summary.errors }}</div>
+            <div class="label">错误</div>
+          </div>
+          <div class="summary-item">
+            <div class="num num-warn">{{ singleResult.summary.warnings }}</div>
+            <div class="label">警告</div>
+          </div>
+          <div class="summary-item">
+            <div class="num num-info">{{ singleResult.summary.suggestions }}</div>
+            <div class="label">建议</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">扫描结果 ({{ singleResult.issues.length }})</div>
+          <div v-for="(issue, index) in singleResult.issues" :key="index" class="issue">
+            <div class="issue-header">
+              <div class="issue-icon" :class="'icon-' + issue.severity">
+                <span v-if="issue.severity === 'error'">✕</span>
+                <span v-else-if="issue.severity === 'warning'">!</span>
+                <span v-else>ℹ</span>
+              </div>
+              <div class="issue-content">
+                <div class="issue-meta">
+                  <span class="tag" :class="'tag-' + issue.severity">{{ issue.severity === 'error' ? '错误' : issue.severity === 'warning' ? '警告' : '建议' }}</span>
+                  <span class="line-num">行 {{ issue.line }}</span>
+                  <span class="tag tag-category">{{ issue.category }}</span>
+                </div>
+                <div class="issue-msg">{{ issue.message }}</div>
+                <div class="issue-sug">{{ issue.suggestion }}</div>
+                <div v-if="issue.beforeCode" class="diff">
+                  <div class="diff-before">修改前: <pre>{{ issue.beforeCode }}</pre></div>
+                  <div class="diff-after">修改后: <pre>{{ issue.afterCode }}</pre></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="mode === 'code' && singleResult && singleResult.issues.length === 0" class="panel results-container">
+        <div style="padding: 40px; text-align: center;">
+          <div style="font-size: 48px; color: #2ecc71; margin-bottom: 16px;">✓</div>
+          <div style="font-size: 16px; color: #333;">扫描通过，未发现问题</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -169,19 +308,11 @@
   <script src="/lib/element-ui.js"></script>
   <script>
     const SAMPLE_JAVA = `public class UserService {
-    public User getUserById(Long id) {
+    private int A = 10/0;
+    private StringBuilder sb = null;
+    public void getUser(Long id) {
         String query = "SELECT * FROM users WHERE id = " + id;
-        Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
-        return new User(rs.getString("name"));
-    }
-    
-    int Number = 100;
-    int result = num1 / 0;
-    
-    public void updateUser(User user) {
-        Connection conn = dataSource.getConnection();
-        conn.prepareStatement(UPDATE_SQL).executeUpdate();
+        if (valid) doSomething();
     }
 }`;
 
@@ -202,25 +333,86 @@ SELECT id, username, password FROM users;`;
           selectedFile: null,
           results: {},
           analyzing: false,
+          scannedCount: 0,
+          // 分页
+          filePage: 1,
+          filePageSize: 15,
+          resultPage: 1,
+          resultPageSize: 20,
+          // 搜索
+          fileSearch: '',
+          filterType: '',
+          resultSearch: '',
         }
       },
       computed: {
-        currentSummary() {
-          if (this.mode === 'code') return this.singleResult ? this.singleResult.summary : null
-          return this.selectedFile && this.results[this.selectedFile] ? this.results[this.selectedFile].summary : null
+        selectedFileName() {
+          if (!this.selectedFile) return ''
+          return this.selectedFile.split('/').pop() || this.selectedFile
         },
-        currentIssues() {
-          if (this.mode === 'code') return this.singleResult ? this.singleResult.issues : []
-          return this.selectedFile && this.results[this.selectedFile] ? this.results[this.selectedFile].issues : []
+        selectedFileContent() {
+          if (!this.selectedFile) return ''
+          const file = this.fileList.find(f => f.path === this.selectedFile)
+          return file ? file.content : ''
         },
-        showSuccess() {
-          return (this.mode === 'code' && this.singleResult && this.singleResult.issues.length === 0) ||
-                 (this.mode === 'folder' && this.selectedFile && this.results[this.selectedFile] && this.results[this.selectedFile].issues.length === 0)
-        }
+        filteredFiles() {
+          let files = this.fileList
+          if (this.fileSearch) {
+            const kw = this.fileSearch.toLowerCase()
+            files = files.filter(f => f.name.toLowerCase().includes(kw))
+          }
+          if (this.filterType) {
+            files = files.filter(f => f.name.endsWith('.' + this.filterType))
+          }
+          return files
+        },
+        paginatedFiles() {
+          const start = (this.filePage - 1) * this.filePageSize
+          return this.filteredFiles.slice(start, start + this.filePageSize)
+        },
+        totalSummary() {
+          if (Object.keys(this.results).length === 0) return null
+          const total = { total: 0, errors: 0, warnings: 0, suggestions: 0 }
+          for (const key in this.results) {
+            const r = this.results[key].summary || {}
+            total.total += r.total || 0
+            total.errors += r.errors || 0
+            total.warnings += r.warnings || 0
+            total.suggestions += r.suggestions || 0
+          }
+          return total
+        },
+        allResults() {
+          const results = []
+          for (const key in this.results) {
+            const fileName = key.split('/').pop()
+            for (const issue of (this.results[key].issues || [])) {
+              results.push({ ...issue, file: fileName })
+            }
+          }
+          return results
+        },
+        filteredResults() {
+          if (!this.resultSearch) return this.allResults
+          const kw = this.resultSearch.toLowerCase()
+          return this.allResults.filter(r => 
+            r.message.toLowerCase().includes(kw) || 
+            r.suggestion.toLowerCase().includes(kw) ||
+            r.file.toLowerCase().includes(kw)
+          )
+        },
+        paginatedResults() {
+          const start = (this.resultPage - 1) * this.resultPageSize
+          return this.filteredResults.slice(start, start + this.resultPageSize)
+        },
+      },
+      watch: {
+        fileSearch() { this.filePage = 1 },
+        filterType() { this.filePage = 1 },
+        resultSearch() { this.resultPage = 1 },
       },
       methods: {
         loadSample() {
-          this.language = this.language === 'java' ? 'java' : 'mysql'
           this.codeContent = this.language === 'java' ? SAMPLE_JAVA : SAMPLE_MYSQL
           this.singleResult = null
         },
@@ -236,7 +428,7 @@ SELECT id, username, password FROM users;`;
             })
             this.singleResult = await res.json()
           } catch (e) {
-            this.$message.error('分析失败')
+            this.$message.error('扫描失败')
           } finally {
             this.analyzing = false
           }
@@ -250,6 +442,7 @@ SELECT id, username, password FROM users;`;
           this.fileList = []
           this.results = {}
           this.selectedFile = null
+          this.scannedCount = 0
           for (let i = 0; i < files.length; i++) {
             const file = files[i]
             const ext = file.name.split('.').pop()?.toLowerCase() || ''
@@ -263,10 +456,11 @@ SELECT id, username, password FROM users;`;
         selectFile(file) {
           this.selectedFile = file.path
         },
-        async analyzeFolder() {
+        async analyzeAll() {
           if (this.fileList.length === 0) return
           this.analyzing = true
           this.results = {}
+          this.scannedCount = 0
           for (const file of this.fileList) {
             const lang = file.name.endsWith('.sql') ? 'mysql' : 'java'
             try {
@@ -280,14 +474,15 @@ SELECT id, username, password FROM users;`;
             } catch (e) {
               Vue.set(this.results, file.path, { issues: [], summary: {} })
             }
+            this.scannedCount++
           }
           this.analyzing = false
-        }
+        },
+        filePageChange(page) { this.filePage = page },
+        resultPageChange(page) { this.resultPage = page },
       },
       watch: {
-        activeTab(val) {
-          this.mode = val
-        }
+        activeTab(val) { this.mode = val }
       }
     })
   </script>
