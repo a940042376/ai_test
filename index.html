@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Code Review - Java & MySQL</title>
-  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="/lib/element-ui.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
@@ -40,8 +40,6 @@
     .summary-value.warning { color: #e6a23c; }
     .summary-value.info { color: #409eff; }
     .summary-label { font-size: 12px; color: #909399; margin-top: 4px; }
-    
-    /* Issue cards */
     .issues-list { max-height: 600px; overflow-y: auto; }
     .issue-card { border-bottom: 1px solid #f0f0f0; }
     .issue-card:last-child { border-bottom: none; }
@@ -53,8 +51,6 @@
     .issue-line { font-size: 12px; color: #909399; }
     .issue-message-text { font-size: 14px; font-weight: 500; color: #303133; margin-bottom: 4px; }
     .issue-suggestion-text { font-size: 12px; color: #606266; }
-    
-    /* Code diff */
     .code-diff { background: #1e1e1e; margin: 12px 16px 16px; border-radius: 4px; overflow: hidden; }
     .diff-section { padding: 12px; border-bottom: 1px solid #333; }
     .diff-section:last-child { border-bottom: none; }
@@ -65,22 +61,18 @@
     .diff-code { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.5; color: #d4d4d4; white-space: pre-wrap; word-break: break-all; background: #252526; padding: 8px 12px; border-radius: 4px; max-height: 200px; overflow-y: auto; }
     .diff-code.before { border-left: 3px solid #f14c4c; }
     .diff-code.after { border-left: 3px solid #4ec9b0; }
-    
-    /* Arrow between sections */
     .diff-arrow { text-align: center; padding: 8px; color: #666; font-size: 12px; }
-    .el-icon-bottom { color: #4ec9b0; }
-    
+    .diff-arrow i { color: #4ec9b0; }
     .success-state { padding: 40px 20px; text-align: center; }
     .success-state i { font-size: 48px; color: #67c23a; margin-bottom: 16px; }
     .success-state p { font-size: 16px; font-weight: 500; color: #303133; margin-bottom: 8px; }
     .success-state .hint { font-size: 13px; color: #909399; }
-    
-    /* Category badge */
     .category-tag { background: #f0f2f5; color: #606266; }
     .category-tag.security { background: #fef0f0; color: #f56c6c; }
     .category-tag.performance { background: #fdf6ec; color: #e6a23c; }
     .category-tag.norms { background: #ecf5ff; color: #409eff; }
     .category-tag.runtime { background: #fef0f0; color: #f56c6c; }
+  </style>
 </head>
 <body>
   <div id="app">
@@ -107,7 +99,6 @@
 
       <el-row :gutter="20">
         <el-col :span="mode === 'code' ? 24 : 10">
-          <!-- Code Input Mode -->
           <div v-if="mode === 'code'" class="panel">
             <div class="panel-header">
               <span>输入代码</span>
@@ -120,21 +111,16 @@
               <textarea v-model="codeContent" class="code-textarea" :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'" spellcheck="false"></textarea>
             </div>
             <div class="panel-footer">
-              <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">
-                {{ analyzing ? '分析中...' : '开始审查' }}
-              </el-button>
+              <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">{{ analyzing ? '分析中...' : '开始审查' }}</el-button>
               <el-button size="small" @click="loadSample('java')">Java 示例</el-button>
               <el-button size="small" @click="loadSample('mysql')">MySQL 示例</el-button>
             </div>
           </div>
 
-          <!-- Folder Mode -->
           <div v-else class="panel">
             <div class="panel-header">
               <span>文件列表</span>
-              <el-button size="small" @click="selectFolder">
-                <i class="el-icon-folder-opened"></i> 选择文件夹
-              </el-button>
+              <el-button size="small" @click="selectFolder"><i class="el-icon-folder-opened"></i> 选择文件夹</el-button>
               <input ref="folderInput" type="file" webkitdirectory multiple style="display:none" @change="handleFolderSelect">
             </div>
             <div v-if="fileList.length === 0" class="empty-state">
@@ -149,15 +135,12 @@
               </div>
             </div>
             <div v-if="fileList.length > 0" class="panel-footer">
-              <el-button type="primary" :loading="analyzing" @click="analyzeFolder">
-                {{ analyzing ? '分析中 ' + progress.current + '/' + progress.total : '开始审查' }}
-              </el-button>
+              <el-button type="primary" :loading="analyzing" @click="analyzeFolder">{{ analyzing ? '分析中 ' + progress.current + '/' + progress.total : '开始审查' }}</el-button>
             </div>
           </div>
         </el-col>
 
         <el-col :span="mode === 'code' ? 24 : 14">
-          <!-- Code Preview -->
           <div v-if="mode === 'folder' && selectedFile" class="panel">
             <div class="panel-header">
               <span>{{ selectedFileName }}</span>
@@ -166,7 +149,6 @@
             <pre class="code-preview">{{ selectedFileContent }}</pre>
           </div>
 
-          <!-- Summary -->
           <div v-if="currentSummary" class="summary-cards">
             <el-card class="summary-card" shadow="hover">
               <div class="summary-value">{{ currentSummary.total }}</div>
@@ -186,11 +168,8 @@
             </el-card>
           </div>
 
-          <!-- Issues with Code Diff -->
           <div v-if="currentIssues.length > 0" class="panel">
-            <div class="panel-header">
-              <span>审查结果 ({{ currentIssues.length }})</span>
-            </div>
+            <div class="panel-header"><span>审查结果 ({{ currentIssues.length }})</span></div>
             <div class="issues-list">
               <div v-for="(issue, index) in currentIssues" :key="index" class="issue-card">
                 <div class="issue-header" @click="toggleIssue(index)">
@@ -211,26 +190,14 @@
                   </div>
                 </div>
                 
-                <!-- Code Diff -->
                 <div v-if="expandedIssues[index] && (issue.beforeCode || issue.afterCode)" class="code-diff">
                   <div v-if="issue.beforeCode" class="diff-section">
-                    <div class="diff-label before">
-                      <i class="el-icon-close"></i>
-                      <span>修改前 (有问题)</span>
-                    </div>
+                    <div class="diff-label before"><i class="el-icon-close"></i><span>修改前</span></div>
                     <pre class="diff-code before">{{ issue.beforeCode }}</pre>
                   </div>
-                  
-                  <div v-if="issue.beforeCode && issue.afterCode" class="diff-arrow">
-                    <i class="el-icon-bottom"></i>
-                    <span>修改为</span>
-                  </div>
-                  
+                  <div v-if="issue.beforeCode && issue.afterCode" class="diff-arrow"><i class="el-icon-bottom"></i><span>修改为</span></div>
                   <div v-if="issue.afterCode" class="diff-section">
-                    <div class="diff-label after">
-                      <i class="el-icon-check"></i>
-                      <span>修改后 (推荐)</span>
-                    </div>
+                    <div class="diff-label after"><i class="el-icon-check"></i><span>修改后</span></div>
                     <pre class="diff-code after">{{ issue.afterCode }}</pre>
                   </div>
                 </div>
@@ -238,7 +205,6 @@
             </div>
           </div>
 
-          <!-- Empty States -->
           <div v-if="mode === 'code' && !singleResult && !analyzing" class="panel empty-state">
             <i class="el-icon-edit-outline"></i>
             <p>输入代码开始审查</p>
@@ -263,8 +229,8 @@
     </main>
   </div>
 
-  <script src="https://unpkg.com/vue@2.7.16/dist/vue.min.js"></script>
-  <script src="https://unpkg.com/element-ui@2.15.14/lib/index.js"></script>
+  <script src="/lib/vue.min.js"></script>
+  <script src="/lib/element-ui.js"></script>
   <script>
     const SAMPLE_JAVA = `public class UserService {
     // SQL注入风险
@@ -275,15 +241,14 @@
         return new User(rs.getString("name"));
     }
     
+    // 命名规范和除零错误
+    int A = 10/0;
+    int Number = 100;
+    
     // 资源泄漏
     public void updateUser(User user) {
         Connection conn = dataSource.getConnection();
         conn.prepareStatement(UPDATE_SQL).executeUpdate();
-    }
-    
-    // 日志规范
-    public void logMessage(String msg) {
-        System.out.println("Message: " + msg);
     }
 }`;
 
@@ -295,10 +260,7 @@ SELECT * FROM orders, customers
 WHERE orders.customer_id = customers.id;
 
 -- 安全风险
-SELECT id, username, password FROM users;
-
--- 不指定列名
-INSERT INTO users VALUES (1, 'Tom', 'tom@email.com');`;
+SELECT id, username, password FROM users;`;
 
     new Vue({
       el: '#app',
@@ -366,7 +328,6 @@ INSERT INTO users VALUES (1, 'Tom', 'tom@email.com');`;
             })
             const data = await response.json()
             this.singleResult = data
-            // 展开所有有修改样例的问题
             if (data.issues) {
               data.issues.forEach((issue, i) => {
                 if (issue.beforeCode || issue.afterCode) {
