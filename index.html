@@ -20,9 +20,9 @@
     .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 500; color: #303133; }
     .panel-footer { padding: 12px 16px; border-top: 1px solid #f0f0f0; }
     .code-editor { height: 380px; }
-    .code-textarea { width: 100%; height: 100%; padding: 16px; border: none; resize: none; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.6; background: #fafafa; }
+    .code-textarea { width: 100%; height: 100%; padding: 16px; border: none; resize: none; font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; line-height: 1.6; background: #282c34; color: #abb2bf; }
     .code-textarea:focus { outline: none; }
-    .code-preview { max-height: 280px; overflow: auto; padding: 16px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.6; background: #fafafa; white-space: pre-wrap; }
+    .code-preview { max-height: 280px; overflow: auto; padding: 16px; margin: 0; font-family: monospace; font-size: 13px; line-height: 1.6; background: #282c34; color: #abb2bf; white-space: pre-wrap; }
     .empty-state { padding: 60px 20px; text-align: center; color: #909399; }
     .empty-state i { font-size: 48px; color: #c0c4cc; margin-bottom: 16px; }
     .empty-state p { font-size: 14px; margin-bottom: 8px; }
@@ -40,18 +40,46 @@
     .summary-value.warning { color: #e6a23c; }
     .summary-value.info { color: #409eff; }
     .summary-label { font-size: 12px; color: #909399; margin-top: 4px; }
-    .issues-list { max-height: 400px; overflow-y: auto; }
-    .issue-item { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
-    .issue-item:last-child { border-bottom: none; }
-    .issue-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    
+    /* Issue cards */
+    .issues-list { max-height: 600px; overflow-y: auto; }
+    .issue-card { border-bottom: 1px solid #f0f0f0; }
+    .issue-card:last-child { border-bottom: none; }
+    .issue-header { padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+    .issue-header:hover { background: #fafafa; }
+    .issue-icon { font-size: 18px; margin-top: 2px; }
+    .issue-content { flex: 1; }
+    .issue-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
     .issue-line { font-size: 12px; color: #909399; }
-    .issue-message { font-size: 14px; font-weight: 500; color: #303133; margin-bottom: 8px; }
-    .issue-suggestion { font-size: 12px; color: #909399; background: #f5f7fa; padding: 8px 12px; border-radius: 4px; }
-    .issue-suggestion i { margin-right: 4px; }
+    .issue-message-text { font-size: 14px; font-weight: 500; color: #303133; margin-bottom: 4px; }
+    .issue-suggestion-text { font-size: 12px; color: #606266; }
+    
+    /* Code diff */
+    .code-diff { background: #1e1e1e; margin: 12px 16px 16px; border-radius: 4px; overflow: hidden; }
+    .diff-section { padding: 12px; border-bottom: 1px solid #333; }
+    .diff-section:last-child { border-bottom: none; }
+    .diff-label { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; font-weight: 500; }
+    .diff-label.before { color: #f14c4c; }
+    .diff-label.after { color: #4ec9b0; }
+    .diff-label i { margin-right: 4px; }
+    .diff-code { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.5; color: #d4d4d4; white-space: pre-wrap; word-break: break-all; background: #252526; padding: 8px 12px; border-radius: 4px; max-height: 200px; overflow-y: auto; }
+    .diff-code.before { border-left: 3px solid #f14c4c; }
+    .diff-code.after { border-left: 3px solid #4ec9b0; }
+    
+    /* Arrow between sections */
+    .diff-arrow { text-align: center; padding: 8px; color: #666; font-size: 12px; }
+    .el-icon-bottom { color: #4ec9b0; }
+    
     .success-state { padding: 40px 20px; text-align: center; }
     .success-state i { font-size: 48px; color: #67c23a; margin-bottom: 16px; }
     .success-state p { font-size: 16px; font-weight: 500; color: #303133; margin-bottom: 8px; }
     .success-state .hint { font-size: 13px; color: #909399; }
+    
+    /* Category badge */
+    .category-tag { background: #f0f2f5; color: #606266; }
+    .category-tag.security { background: #fef0f0; color: #f56c6c; }
+    .category-tag.performance { background: #fdf6ec; color: #e6a23c; }
+    .category-tag.norms { background: #ecf5ff; color: #409eff; }
   </style>
 </head>
 <body>
@@ -61,7 +89,7 @@
         <div class="header-left">
           <i class="el-icon-document"></i>
           <span class="title">Code Review</span>
-          <span class="subtitle">Java & MySQL</span>
+          <span class="subtitle">Java & MySQL 代码规范审查</span>
         </div>
         <el-tag v-if="mode === 'folder' && fileList.length > 0" size="small">{{ fileList.length }} 文件</el-tag>
       </div>
@@ -83,13 +111,13 @@
           <div v-if="mode === 'code'" class="panel">
             <div class="panel-header">
               <span>输入代码</span>
-              <el-select v-model="language" size="small" style="width: 100px">
+              <el-select v-model="language" size="small" style="width: 120px">
                 <el-option label="Java" value="java"></el-option>
                 <el-option label="MySQL" value="mysql"></el-option>
               </el-select>
             </div>
             <div class="code-editor">
-              <textarea v-model="codeContent" class="code-textarea" :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'"></textarea>
+              <textarea v-model="codeContent" class="code-textarea" :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'" spellcheck="false"></textarea>
             </div>
             <div class="panel-footer">
               <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">
@@ -158,18 +186,54 @@
             </el-card>
           </div>
 
-          <!-- Issues -->
+          <!-- Issues with Code Diff -->
           <div v-if="currentIssues.length > 0" class="panel">
-            <div class="panel-header"><span>审查结果</span></div>
+            <div class="panel-header">
+              <span>审查结果 ({{ currentIssues.length }})</span>
+            </div>
             <div class="issues-list">
-              <div v-for="(issue, index) in currentIssues" :key="index" class="issue-item">
-                <div class="issue-header">
-                  <el-tag :type="getSeverityType(issue.severity)" size="small">{{ getSeverityText(issue.severity) }}</el-tag>
-                  <span class="issue-line">行 {{ issue.line }}</span>
-                  <el-tag size="small" type="info">{{ getCategoryText(issue.category) }}</el-tag>
+              <div v-for="(issue, index) in currentIssues" :key="index" class="issue-card">
+                <div class="issue-header" @click="toggleIssue(index)">
+                  <div class="issue-icon">
+                    <i v-if="issue.severity === 'error'" class="el-icon-error" style="color: #f56c6c"></i>
+                    <i v-else-if="issue.severity === 'warning'" class="el-icon-warning" style="color: #e6a23c"></i>
+                    <i v-else class="el-icon-info" style="color: #409eff"></i>
+                  </div>
+                  <div class="issue-content">
+                    <div class="issue-meta">
+                      <el-tag :type="getSeverityType(issue.severity)" size="small">{{ getSeverityText(issue.severity) }}</el-tag>
+                      <span class="issue-line">行 {{ issue.line }}</span>
+                      <el-tag size="small" :class="'category-tag ' + issue.category">{{ getCategoryText(issue.category) }}</el-tag>
+                      <i :class="expandedIssues[index] ? 'el-icon-arrow-down' : 'el-icon-arrow-right'" style="color: #c0c4cc; margin-left: auto;"></i>
+                    </div>
+                    <div class="issue-message-text">{{ issue.message }}</div>
+                    <div class="issue-suggestion-text">{{ issue.suggestion }}</div>
+                  </div>
                 </div>
-                <div class="issue-message">{{ issue.message }}</div>
-                <div class="issue-suggestion"><i class="el-icon-info"></i> {{ issue.suggestion }}</div>
+                
+                <!-- Code Diff -->
+                <div v-if="expandedIssues[index] && (issue.beforeCode || issue.afterCode)" class="code-diff">
+                  <div v-if="issue.beforeCode" class="diff-section">
+                    <div class="diff-label before">
+                      <i class="el-icon-close"></i>
+                      <span>修改前 (有问题)</span>
+                    </div>
+                    <pre class="diff-code before">{{ issue.beforeCode }}</pre>
+                  </div>
+                  
+                  <div v-if="issue.beforeCode && issue.afterCode" class="diff-arrow">
+                    <i class="el-icon-bottom"></i>
+                    <span>修改为</span>
+                  </div>
+                  
+                  <div v-if="issue.afterCode" class="diff-section">
+                    <div class="diff-label after">
+                      <i class="el-icon-check"></i>
+                      <span>修改后 (推荐)</span>
+                    </div>
+                    <pre class="diff-code after">{{ issue.afterCode }}</pre>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -178,7 +242,7 @@
           <div v-if="mode === 'code' && !singleResult && !analyzing" class="panel empty-state">
             <i class="el-icon-edit-outline"></i>
             <p>输入代码开始审查</p>
-            <p class="hint">支持 Java 和 MySQL 代码分析</p>
+            <p class="hint">支持 Java 和 MySQL 代码规范检查，并提供修改建议</p>
           </div>
 
           <div v-if="mode === 'folder' && fileList.length === 0" class="panel empty-state">
@@ -191,7 +255,7 @@
             <div class="success-state">
               <i class="el-icon-success"></i>
               <p>审查通过</p>
-              <p class="hint">未发现问题</p>
+              <p class="hint">未发现问题，代码符合规范</p>
             </div>
           </div>
         </el-col>
@@ -203,6 +267,7 @@
   <script src="https://unpkg.com/element-ui@2.15.14/lib/index.js"></script>
   <script>
     const SAMPLE_JAVA = `public class UserService {
+    // SQL注入风险
     public User getUserById(Long id) {
         String query = "SELECT * FROM users WHERE id = " + id;
         Statement stmt = connection.createStatement();
@@ -210,25 +275,30 @@
         return new User(rs.getString("name"));
     }
     
+    // 资源泄漏
     public void updateUser(User user) {
         Connection conn = dataSource.getConnection();
         conn.prepareStatement(UPDATE_SQL).executeUpdate();
     }
+    
+    // 日志规范
+    public void logMessage(String msg) {
+        System.out.println("Message: " + msg);
+    }
 }`;
 
-    const SAMPLE_MYSQL = `-- 低效查询
-SELECT * FROM orders o, customers c 
-WHERE o.customer_id = c.id AND c.status = 'active'
-ORDER BY o.created_at DESC;
+    const SAMPLE_MYSQL = `-- 性能问题
+SELECT * FROM orders WHERE status = 'pending';
 
--- 缺少索引优化建议的查询
-SELECT user_id, COUNT(*) 
-FROM transactions 
-GROUP BY user_id 
-HAVING COUNT(*) > 10;
+-- 隐式连接
+SELECT * FROM orders, customers 
+WHERE orders.customer_id = customers.id;
 
--- 安全问题示例
-SELECT name, password FROM users WHERE id = 1;`;
+-- 安全风险
+SELECT id, username, password FROM users;
+
+-- 不指定列名
+INSERT INTO users VALUES (1, 'Tom', 'tom@email.com');`;
 
     new Vue({
       el: '#app',
@@ -243,7 +313,8 @@ SELECT name, password FROM users WHERE id = 1;`;
           selectedFile: null,
           results: {},
           analyzing: false,
-          progress: { current: 0, total: 0 }
+          progress: { current: 0, total: 0 },
+          expandedIssues: {}
         }
       },
       computed: {
@@ -269,10 +340,14 @@ SELECT name, password FROM users WHERE id = 1;`;
         onTabClick(tab) {
           this.mode = tab.name
         },
+        toggleIssue(index) {
+          this.$set(this.expandedIssues, index, !this.expandedIssues[index])
+        },
         loadSample(type) {
           this.language = type
           this.codeContent = type === 'java' ? SAMPLE_JAVA : SAMPLE_MYSQL
           this.singleResult = null
+          this.expandedIssues = {}
         },
         detectLanguage(filename) {
           const ext = filename.split('.').pop() ? filename.split('.').pop().toLowerCase() : ''
@@ -282,6 +357,7 @@ SELECT name, password FROM users WHERE id = 1;`;
           if (!this.codeContent.trim()) return
           this.analyzing = true
           this.singleResult = null
+          this.expandedIssues = {}
           try {
             const response = await fetch('/api/code-review', {
               method: 'POST',
@@ -290,6 +366,14 @@ SELECT name, password FROM users WHERE id = 1;`;
             })
             const data = await response.json()
             this.singleResult = data
+            // 展开所有有修改样例的问题
+            if (data.issues) {
+              data.issues.forEach((issue, i) => {
+                if (issue.beforeCode || issue.afterCode) {
+                  this.$set(this.expandedIssues, i, true)
+                }
+              })
+            }
           } catch (e) {
             this.$message.error('分析失败')
           } finally {
@@ -305,6 +389,7 @@ SELECT name, password FROM users WHERE id = 1;`;
           this.fileList = []
           this.results = {}
           this.selectedFile = null
+          this.expandedIssues = {}
           for (let i = 0; i < files.length; i++) {
             const file = files[i]
             const ext = file.name.split('.').pop() ? file.name.split('.').pop().toLowerCase() : ''
@@ -323,6 +408,14 @@ SELECT name, password FROM users WHERE id = 1;`;
         },
         selectFile(file) {
           this.selectedFile = file.path
+          this.expandedIssues = {}
+          if (this.results[file.path] && this.results[file.path].issues) {
+            this.results[file.path].issues.forEach((issue, i) => {
+              if (issue.beforeCode || issue.afterCode) {
+                this.$set(this.expandedIssues, i, true)
+              }
+            })
+          }
         },
         removeFile() {
           if (!this.selectedFile) return
@@ -334,6 +427,7 @@ SELECT name, password FROM users WHERE id = 1;`;
           if (this.fileList.length === 0) return
           this.analyzing = true
           this.results = {}
+          this.expandedIssues = {}
           this.progress = { current: 0, total: this.fileList.length }
           for (let i = 0; i < this.fileList.length; i++) {
             const file = this.fileList[i]
@@ -368,7 +462,7 @@ SELECT name, password FROM users WHERE id = 1;`;
           return map[severity] || severity
         },
         getCategoryText(category) {
-          const map = { security: '安全', performance: '性能', 'best-practice': '实践', syntax: '语法' }
+          const map = { security: '安全', performance: '性能', 'best-practice': '实践', norms: '规范' }
           return map[category] || category
         }
       }
