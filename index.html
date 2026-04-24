@@ -14,7 +14,6 @@
     .panel { background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .panel-header { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; display: flex; align-items: center; justify-content: space-between; }
     .search-bar { padding: 12px 16px; border-bottom: 1px solid #eee; display: flex; gap: 12px; }
-    .search-bar .el-input { width: 300px; }
     .file-list { max-height: 400px; overflow-y: auto; }
     .file-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f5; display: flex; align-items: center; gap: 10px; }
     .file-item:hover { background: #fafafa; }
@@ -22,16 +21,16 @@
     .file-icon { width: 32px; height: 32px; border-radius: 4px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #666; font-size: 14px; }
     .file-icon.java { background: #ffeeba; color: #e6a23c; }
     .file-icon.sql { background: #e6f4ff; color: #409eff; }
-    .file-info { flex: 1; }
-    .file-name { font-size: 13px; color: #333; }
-    .file-path { font-size: 11px; color: #999; margin-top: 2px; }
-    .file-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .file-info { flex: 1; overflow: hidden; }
+    .file-name { font-size: 13px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-path { font-size: 11px; color: #999; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; flex-shrink: 0; }
     .badge-error { background: #fef0f0; color: #f56c6c; }
     .badge-success { background: #f0f9eb; color: #67c23a; }
     .editor { height: 200px; background: #282c34; }
     .editor textarea { width: 100%; height: 100%; padding: 16px; border: none; resize: none; font-family: monospace; font-size: 13px; line-height: 1.5; background: #282c34; color: #abb2bf; }
     .editor textarea:focus { outline: none; }
-    .footer { padding: 12px 16px; border-top: 1px solid #eee; }
+    .footer { padding: 12px 16px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 12px; }
     .summary { display: flex; gap: 16px; margin-bottom: 16px; }
     .summary-item { background: #fff; padding: 16px 24px; border-radius: 4px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex: 1; }
     .summary-item .num { font-size: 28px; font-weight: 600; }
@@ -47,7 +46,7 @@
     .icon-warn { background: #fff8e6; color: #f39c12; }
     .icon-info { background: #e6f4ff; color: #3498db; }
     .issue-content { flex: 1; }
-    .issue-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .issue-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
     .issue-msg { font-size: 14px; color: #333; }
     .issue-sug { font-size: 12px; color: #999; margin-top: 4px; }
     .tag { padding: 2px 8px; border-radius: 3px; font-size: 11px; }
@@ -66,6 +65,7 @@
     .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #282c34; }
     .code-preview pre { font-family: monospace; font-size: 12px; color: #abb2bf; white-space: pre-wrap; margin: 0; }
     .results-container { margin-top: 16px; }
+    .tab-tip { padding: 8px 16px; background: #f0f9eb; color: #67c23a; font-size: 13px; border-bottom: 1px solid #e1f3d8; }
   </style>
 </head>
 <body>
@@ -101,26 +101,38 @@
 
       <!-- 文件夹扫描 -->
       <div v-else>
+        <!-- 提示栏 -->
+        <div class="tab-tip" v-if="fileList.length === 0">
+          点击上方「选择文件夹」按钮，添加包含 Java 或 SQL 文件的文件夹
+        </div>
+
         <div class="panel" style="margin-bottom: 16px;">
           <div class="panel-header">
-            <span>文件列表 ({{ filteredFiles.length }} 个文件)</span>
-            <el-button size="small" @click="selectFolder">
+            <span>文件列表</span>
+            <el-button size="small" type="primary" @click="selectFolder">
               <i class="el-icon-folder-opened"></i> 选择文件夹
             </el-button>
             <input ref="folderInput" type="file" webkitdirectory multiple style="display:none" @change="handleFolderSelect">
           </div>
+          
+          <!-- 搜索栏 -->
           <div class="search-bar" v-if="fileList.length > 0">
-            <el-input v-model="fileSearch" placeholder="搜索文件名..." prefix-icon="el-icon-search" clearable></el-input>
-            <el-select v-model="filterType" size="small" style="width: 120px" clearable placeholder="文件类型">
+            <el-input v-model="fileSearch" placeholder="搜索文件名..." prefix-icon="el-icon-search" clearable size="small" style="width: 250px;"></el-input>
+            <el-select v-model="filterType" size="small" style="width: 100px;" clearable placeholder="类型">
               <el-option label="全部" value=""></el-option>
               <el-option label="Java" value="java"></el-option>
               <el-option label="SQL" value="sql"></el-option>
             </el-select>
+            <span style="color: #999; font-size: 13px;">共 {{ filteredFiles.length }} 个文件</span>
           </div>
+          
+          <!-- 空状态 -->
           <div v-if="fileList.length === 0" class="empty-state">
             <i class="el-icon-folder-opened"></i>
-            <p>选择包含 Java 或 SQL 文件的文件夹</p>
+            <p>暂未选择文件夹</p>
           </div>
+          
+          <!-- 文件列表 -->
           <div v-else class="file-list">
             <div v-for="file in paginatedFiles" :key="file.path" class="file-item" :class="{ active: selectedFile === file.path }" @click="selectFile(file)">
               <div class="file-icon" :class="file.name.endsWith('.sql') ? 'sql' : 'java'">
@@ -135,6 +147,8 @@
               </span>
             </div>
           </div>
+          
+          <!-- 文件分页 -->
           <div class="pagination" v-if="filteredFiles.length > filePageSize">
             <el-pagination
               @current-change="filePageChange"
@@ -144,12 +158,17 @@
               layout="prev, pager, next">
             </el-pagination>
           </div>
+          
+          <!-- 底部操作栏 -->
           <div class="footer" v-if="fileList.length > 0">
-            <el-button type="primary" :loading="analyzing" @click="analyzeAll">
-              {{ analyzing ? '扫描中...' : '开始扫描全部 (' + fileList.length + ')' }}
+            <el-button type="primary" :loading="analyzing" @click="analyzeAll" :disabled="fileList.length === 0">
+              {{ analyzing ? '扫描中 (' + scannedCount + '/' + fileList.length + ')' : '开始扫描' }}
             </el-button>
-            <span style="margin-left: 16px; color: #999; font-size: 13px;" v-if="scannedCount > 0">
-              已扫描: {{ scannedCount }}/{{ fileList.length }}
+            <span v-if="scannedCount > 0 && scannedCount < fileList.length" style="color: #999; font-size: 13px;">
+              已扫描 {{ scannedCount }}/{{ fileList.length }}
+            </span>
+            <span v-if="scannedCount === fileList.length && !analyzing" style="color: #67c23a; font-size: 13px;">
+              扫描完成
             </span>
           </div>
         </div>
@@ -189,7 +208,7 @@
             </div>
           </div>
 
-          <!-- 结果搜索 -->
+          <!-- 结果列表 -->
           <div v-if="allResults.length > 0" class="panel">
             <div class="panel-header">
               <span>扫描结果 ({{ filteredResults.length }} 条)</span>
@@ -234,16 +253,12 @@
             </div>
           </div>
 
+          <!-- 扫描完成提示 -->
           <div v-if="fileList.length > 0 && !analyzing && allResults.length === 0 && scannedCount === fileList.length" class="panel">
             <div style="padding: 40px; text-align: center;">
               <div style="font-size: 48px; color: #2ecc71; margin-bottom: 16px;">✓</div>
               <div style="font-size: 16px; color: #333;">扫描完成，未发现问题</div>
             </div>
-          </div>
-
-          <div v-if="fileList.length === 0" class="panel empty-state">
-            <i class="el-icon-folder-opened"></i>
-            <p>选择文件夹开始扫描</p>
           </div>
         </div>
       </div>
@@ -341,14 +356,16 @@
         },
         selectedFileContent: function() {
           if (!this.selectedFile) return ''
-          var file = this.fileList.find(function(f) { return f.path === this.selectedFile }, this)
-          return file ? file.content : ''
+          for (var i = 0; i < this.fileList.length; i++) {
+            if (this.fileList[i].path === this.selectedFile) return this.fileList[i].content
+          }
+          return ''
         },
         filteredFiles: function() {
           var files = this.fileList
           if (this.fileSearch) {
             var kw = this.fileSearch.toLowerCase()
-            files = files.filter(function(f) { return f.name.toLowerCase().includes(kw) })
+            files = files.filter(function(f) { return f.name.toLowerCase().indexOf(kw) !== -1 })
           }
           if (this.filterType) {
             files = files.filter(function(f) { return f.name.endsWith('.' + this.filterType) }, this)
@@ -375,8 +392,9 @@
           var results = []
           for (var key in this.results) {
             var fileName = key.split('/').pop()
-            for (var i = 0; i < (this.results[key].issues || []).length; i++) {
-              var issue = this.results[key].issues[i]
+            var issues = this.results[key].issues || []
+            for (var i = 0; i < issues.length; i++) {
+              var issue = issues[i]
               issue.file = fileName
               results.push(issue)
             }
@@ -387,9 +405,9 @@
           if (!this.resultSearch) return this.allResults
           var kw = this.resultSearch.toLowerCase()
           return this.allResults.filter(function(r) {
-            return r.message.toLowerCase().includes(kw) ||
-              r.suggestion.toLowerCase().includes(kw) ||
-              r.file.toLowerCase().includes(kw)
+            return r.message.toLowerCase().indexOf(kw) !== -1 ||
+              r.suggestion.toLowerCase().indexOf(kw) !== -1 ||
+              r.file.toLowerCase().indexOf(kw) !== -1
           })
         },
         paginatedResults: function() {
@@ -429,18 +447,28 @@
         handleFolderSelect: function(e) {
           var self = this
           var files = e.target.files
-          if (!files) return
+          if (!files || files.length === 0) return
           this.fileList = []
           this.results = {}
           this.selectedFile = null
           this.scannedCount = 0
+          this.filePage = 1
+          
+          var count = 0
           for (var i = 0; i < files.length; i++) {
             (function(file) {
-              var ext = file.name.split('.').pop() ? file.name.split('.').pop().toLowerCase() : ''
+              var ext = file.name.split('.').pop()
+              ext = ext ? ext.toLowerCase() : ''
               if (ext === 'java' || ext === 'sql') {
                 file.text().then(function(content) {
-                  self.fileList.push({ path: file.webkitRelativePath || file.name, name: file.name, content: content })
-                  if (self.fileList.length === 1) self.selectedFile = self.fileList[0].path
+                  self.fileList.push({ 
+                    path: file.webkitRelativePath || file.name, 
+                    name: file.name, 
+                    content: content 
+                  })
+                  if (self.fileList.length === 1) {
+                    self.selectedFile = self.fileList[0].path
+                  }
                 })
               }
             })(files[i])
@@ -453,9 +481,11 @@
           var self = this
           if (this.fileList.length === 0) return
           this.analyzing = true
-          this.results = {}
           this.scannedCount = 0
-          var count = 0
+          var total = this.fileList.length
+          var done = 0
+          
+          var self = this
           this.fileList.forEach(function(file) {
             var lang = file.name.endsWith('.sql') ? 'mysql' : 'java'
             fetch('/api/code-review', {
@@ -465,15 +495,21 @@
             })
             .then(function(res) { return res.json() })
             .then(function(data) {
-              self.$set(self.results, file.path, { issues: data.issues || [], summary: data.summary || {} })
+              self.$set(self.results, file.path, { 
+                issues: data.issues || [], 
+                summary: data.summary || {},
+                total: data.summary ? data.summary.total : 0
+              })
             })
             .catch(function() {
-              self.$set(self.results, file.path, { issues: [], summary: {} })
+              self.$set(self.results, file.path, { issues: [], summary: {}, total: 0 })
             })
             .finally(function() {
-              count++
-              self.scannedCount = count
-              if (count === self.fileList.length) self.analyzing = false
+              done++
+              self.scannedCount = done
+              if (done === total) {
+                self.analyzing = false
+              }
             })
           })
         },
