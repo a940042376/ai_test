@@ -102,15 +102,18 @@
       <!-- 文件夹扫描 -->
       <div v-else>
         <div class="tab-tip" v-if="fileList.length === 0">
-          点击上方「选择文件夹」按钮，添加包含 Java 或 SQL 文件的文件夹
+          点击上方「选择文件夹」按钮添加文件，或点击「加载示例」查看示例
         </div>
 
         <div class="panel" style="margin-bottom: 16px;">
           <div class="panel-header">
             <span>文件列表</span>
-            <el-button size="small" type="primary" @click="selectFolder">
-              <i class="el-icon-folder-opened"></i> 选择文件夹
-            </el-button>
+            <div>
+              <el-button size="small" @click="loadFolderSample">加载示例</el-button>
+              <el-button size="small" type="primary" @click="selectFolder">
+                <i class="el-icon-folder-opened"></i> 选择文件夹
+              </el-button>
+            </div>
             <input ref="folderInput" type="file" webkitdirectory multiple style="display:none" @change="handleFolderSelect">
           </div>
           
@@ -316,6 +319,30 @@
 
     var SAMPLE_MYSQL = 'SELECT * FROM orders WHERE status = \'pending\';\nSELECT * FROM orders, customers WHERE orders.customer_id = customers.id;\nSELECT id, username, password FROM users;';
 
+    // 文件夹扫描示例文件
+    var SAMPLE_FILES = [
+      {
+        path: 'demo/UserService.java',
+        name: 'UserService.java',
+        content: 'package com.example.service;\n\nimport java.sql.*;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class UserService {\n    // 命名规范问题：变量名大写开头\n    private int Number = 100;\n    private String Name = "admin";\n    \n    // SQL注入风险\n    public User getUserById(Long id) throws SQLException {\n        String query = "SELECT * FROM users WHERE id = " + id;\n        Statement stmt = connection.createStatement();\n        ResultSet rs = stmt.executeQuery(query);\n        if (rs.next()) {\n            return new User(rs.getString("name"));\n        }\n        return null;\n    }\n    \n    // 空指针风险\n    public String processData(String data) {\n        StringBuilder sb = null;\n        sb.append(data.toUpperCase());\n        return sb.toString();\n    }\n    \n    // 硬编码密码\n    private String password = "123456";\n    \n    // if语句缺少大括号\n    public void checkStatus(boolean valid) {\n        if (valid)\n            doSomething();\n    }\n    \n    // 基本类型POJO属性\n    private int count;\n    private boolean isActive;\n    \n    // 生吞异常\n    public void updateUser(User user) {\n        try {\n            conn.prepareStatement(UPDATE_SQL);\n        } catch (Exception e) {\n            // 生吞异常\n        }\n    }\n    \n    private Connection connection;\n}'
+      },
+      {
+        path: 'demo/OrderMapper.java',
+        name: 'OrderMapper.java',
+        content: 'package com.example.mapper;\n\nimport java.util.*;\n\npublic class OrderMapper {\n    // 除零错误\n    public int calculate(int total, int count) {\n        return total / count;\n    }\n    \n    // 隐式类型转换\n    public double average(int total, int count) {\n        return total / count;\n    }\n    \n    // Collection转数组错误\n    public String[] getNames(List<String> names) {\n        return names.toArray();\n    }\n    \n    // Map遍历效率问题\n    public void printMap(Map<String, String> map) {\n        for (String key : map.keySet()) {\n            System.out.println(key + ": " + map.get(key));\n        }\n    }\n    \n    // switch缺少default\n    public String getStatus(int type) {\n        switch (type) {\n            case 1: return "pending";\n            case 2: return "completed";\n        }\n        return "unknown";\n    }\n}'
+      },
+      {
+        path: 'demo/init.sql',
+        name: 'init.sql',
+        content: '-- MySQL规范示例\n\n-- 1. SELECT * 性能问题\nSELECT * FROM orders WHERE status = \'pending\';\n\n-- 2. 隐式连接\nSELECT * FROM orders, customers WHERE orders.customer_id = customers.id;\n\n-- 3. 密码字段明文\nSELECT id, username, password FROM users;\n\n-- 4. 建议使用显式JOIN\nSELECT o.id, o.order_no, c.name as customer_name\nFROM orders o\nINNER JOIN customers c ON o.customer_id = c.id\nWHERE o.status = \'completed\';'
+      },
+      {
+        path: 'demo/ProductDAO.java',
+        name: 'ProductDAO.java',
+        content: 'package com.example.dao;\n\npublic class ProductDAO {\n    // 线程安全问题\n    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");\n    \n    // volatile不能保证原子性\n    private volatile long counter;\n    \n    // 资源未关闭\n    public ResultSet query(String sql) throws SQLException {\n        Connection conn = dataSource.getConnection();\n        Statement stmt = conn.createStatement();\n        return stmt.executeQuery(sql);\n    }\n    \n    // equals参数顺序问题\n    public boolean validate(String input) {\n        return input.equals(password);\n    }\n    \n    // 空catch块\n    public void save(Object data) {\n        try {\n            // 保存逻辑\n        } catch (Exception e) {\n            \n        }\n    }\n}'
+      }
+    ];
+
     new Vue({
       el: '#app',
       data: function() {
@@ -465,6 +492,20 @@
         },
         selectFile: function(file) {
           this.selectedFile = file.path
+        },
+        loadFolderSample: function() {
+          this.fileList = SAMPLE_FILES.map(function(f) {
+            return {
+              path: f.path,
+              name: f.name,
+              content: f.content
+            }
+          })
+          this.results = {}
+          this.selectedFile = this.fileList[0] ? this.fileList[0].path : null
+          this.scannedCount = 0
+          this.filePage = 1
+          this.$message.success('已加载示例文件')
         },
         analyzeAll: function() {
           var self = this
