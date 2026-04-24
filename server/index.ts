@@ -118,10 +118,49 @@ const MYSQL_RULES: any[] = [
   },
 ]
 
-function analyzeCode(code: string, language: string): Issue[] {
-  const lines = code.split('\n')
+// 变量声明为null后直接使用（无判空）
+function checkNullUsage(code: string): Issue[] {
   const issues: Issue[] = []
-  const seen = new Set<string>()
+  const lines = code.split('\n')
+  
+  // 匹配 "类型 变量 = null;" 的声明
+  const nullDecl = /\b(String|StringBuilder|List|Map|Set|Object|\w+)\s+(\w+)\s*=\s*null\s*;/g
+  // 匹配 "变量." 模式（后续使用）
+  const usage = /\b(\w+)\.\w+/g
+  
+  for (const line of lines) {
+    nullDecl.lastIndex = 0
+    const declMatch = nullDecl.exec(line)
+    if (declMatch) {
+      const varName = declMatch[2]
+      usage.lastIndex = 0
+      // 在后续行中查找该变量的使用
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(varName + '.')) {
+          issues.push({
+            line: i + 1,
+            severity: 'error',
+            category: 'runtime',
+            message: '运行时异常：变量声明为 null 后直接使用',
+            suggestion: `变量 ${varName} 声明为 null，调用 ${varName}.xxx 会导致 NPE`,
+            beforeCode: `${varName} = null;`,
+            afterCode: `${varName} = new ${declMatch[1]}();`,
+          })
+          break
+        }
+      }
+    }
+  }
+  return issues
+}
+
+function analyzeCode(code: string, language: string): Issue[] {
+  const issues: Issue[] = []
+  const lines = code.split('\n')
+
+  if (language === 'java') {
+    issues.push(...checkNullUsage(code))
+  }
 
   const rules = language === 'java' ? JAVA_RULES : MYSQL_RULES
 
