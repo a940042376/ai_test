@@ -28,9 +28,20 @@
     .file-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; flex-shrink: 0; }
     .badge-error { background: #fef0f0; color: #f56c6c; }
     .badge-success { background: #f0f9eb; color: #67c23a; }
-    .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #fff; border: 1px solid #eee; border-radius: 4px; }
+    .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #24292e; border: 1px solid #444; border-radius: 4px; }
     .code-preview pre { margin: 0; background: transparent; }
-    .code-preview code { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.5; }
+    .code-preview code { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.5; background: #24292e; color: #e1e4e8; }
+    .code-preview .hljs { background: #24292e; color: #e1e4e8; }
+    .code-preview .hljs-keyword { color: #ff7b72; }
+    .code-preview .hljs-string { color: #a5d6ff; }
+    .code-preview .hljs-number { color: #79c0ff; }
+    .code-preview .hljs-comment { color: #8b949e; }
+    .code-preview .hljs-function { color: #d2a8ff; }
+    .code-preview .hljs-class { color: #ffa657; }
+    .code-preview .hljs-variable { color: #ffa657; }
+    .code-preview .hljs-operator { color: #ff7b72; }
+    .code-preview .hljs-built_in { color: #ffa657; }
+    .code-preview .hljs-type { color: #79c0ff; }
     .code-editor { height: 200px; border-radius: 4px; border: 1px solid #dcdfe6; background: #fff; }
     .code-editor-inner { position: relative; height: 100%; }
     .code-editor textarea { 
@@ -176,7 +187,7 @@
       </div>
 
       <!-- 文件扫描 -->
-      <div v-else>
+      <div v-if="mode === 'folder'">
         <div class="tab-tip" v-if="fileList.length === 0">点击上方「选择文件夹」按钮添加文件，或点击「加载示例」查看示例</div>
 
         <div class="panel" style="margin-bottom: 16px;">
