@@ -135,11 +135,11 @@
               </span>
             </div>
           </div>
-          <div class="pagination" v-if="filteredFiles.length > pageSize">
+          <div class="pagination" v-if="filteredFiles.length > filePageSize">
             <el-pagination
               @current-change="filePageChange"
               :current-page="filePage"
-              :page-size="pageSize"
+              :page-size="filePageSize"
               :total="filteredFiles.length"
               layout="prev, pager, next">
             </el-pagination>
@@ -307,22 +307,13 @@
   <script src="/lib/vue.min.js"></script>
   <script src="/lib/element-ui.js"></script>
   <script>
-    const SAMPLE_JAVA = `public class UserService {
-    private int A = 10/0;
-    private StringBuilder sb = null;
-    public void getUser(Long id) {
-        String query = "SELECT * FROM users WHERE id = " + id;
-        if (valid) doSomething();
-    }
-}`;
+    var SAMPLE_JAVA = 'public class UserService {\n    private int A = 10/0;\n    private StringBuilder sb = null;\n    public void getUser(Long id) {\n        String query = "SELECT * FROM users WHERE id = " + id;\n        if (valid) doSomething();\n    }\n}';
 
-    const SAMPLE_MYSQL = `SELECT * FROM orders WHERE status = 'pending';
-SELECT * FROM orders, customers WHERE orders.customer_id = customers.id;
-SELECT id, username, password FROM users;`;
+    var SAMPLE_MYSQL = 'SELECT * FROM orders WHERE status = \'pending\';\nSELECT * FROM orders, customers WHERE orders.customer_id = customers.id;\nSELECT id, username, password FROM users;';
 
     new Vue({
       el: '#app',
-      data() {
+      data: function() {
         return {
           activeTab: 'code',
           mode: 'code',
@@ -334,47 +325,45 @@ SELECT id, username, password FROM users;`;
           results: {},
           analyzing: false,
           scannedCount: 0,
-          // 分页
           filePage: 1,
           filePageSize: 15,
           resultPage: 1,
           resultPageSize: 20,
-          // 搜索
           fileSearch: '',
           filterType: '',
-          resultSearch: '',
+          resultSearch: ''
         }
       },
       computed: {
-        selectedFileName() {
+        selectedFileName: function() {
           if (!this.selectedFile) return ''
           return this.selectedFile.split('/').pop() || this.selectedFile
         },
-        selectedFileContent() {
+        selectedFileContent: function() {
           if (!this.selectedFile) return ''
-          const file = this.fileList.find(f => f.path === this.selectedFile)
+          var file = this.fileList.find(function(f) { return f.path === this.selectedFile }, this)
           return file ? file.content : ''
         },
-        filteredFiles() {
-          let files = this.fileList
+        filteredFiles: function() {
+          var files = this.fileList
           if (this.fileSearch) {
-            const kw = this.fileSearch.toLowerCase()
-            files = files.filter(f => f.name.toLowerCase().includes(kw))
+            var kw = this.fileSearch.toLowerCase()
+            files = files.filter(function(f) { return f.name.toLowerCase().includes(kw) })
           }
           if (this.filterType) {
-            files = files.filter(f => f.name.endsWith('.' + this.filterType))
+            files = files.filter(function(f) { return f.name.endsWith('.' + this.filterType) }, this)
           }
           return files
         },
-        paginatedFiles() {
-          const start = (this.filePage - 1) * this.filePageSize
+        paginatedFiles: function() {
+          var start = (this.filePage - 1) * this.filePageSize
           return this.filteredFiles.slice(start, start + this.filePageSize)
         },
-        totalSummary() {
+        totalSummary: function() {
           if (Object.keys(this.results).length === 0) return null
-          const total = { total: 0, errors: 0, warnings: 0, suggestions: 0 }
-          for (const key in this.results) {
-            const r = this.results[key].summary || {}
+          var total = { total: 0, errors: 0, warnings: 0, suggestions: 0 }
+          for (var key in this.results) {
+            var r = this.results[key].summary || {}
             total.total += r.total || 0
             total.errors += r.errors || 0
             total.warnings += r.warnings || 0
@@ -382,107 +371,114 @@ SELECT id, username, password FROM users;`;
           }
           return total
         },
-        allResults() {
-          const results = []
-          for (const key in this.results) {
-            const fileName = key.split('/').pop()
-            for (const issue of (this.results[key].issues || [])) {
-              results.push({ ...issue, file: fileName })
+        allResults: function() {
+          var results = []
+          for (var key in this.results) {
+            var fileName = key.split('/').pop()
+            for (var i = 0; i < (this.results[key].issues || []).length; i++) {
+              var issue = this.results[key].issues[i]
+              issue.file = fileName
+              results.push(issue)
             }
           }
           return results
         },
-        filteredResults() {
+        filteredResults: function() {
           if (!this.resultSearch) return this.allResults
-          const kw = this.resultSearch.toLowerCase()
-          return this.allResults.filter(r => 
-            r.message.toLowerCase().includes(kw) || 
-            r.suggestion.toLowerCase().includes(kw) ||
-            r.file.toLowerCase().includes(kw)
-          )
+          var kw = this.resultSearch.toLowerCase()
+          return this.allResults.filter(function(r) {
+            return r.message.toLowerCase().includes(kw) ||
+              r.suggestion.toLowerCase().includes(kw) ||
+              r.file.toLowerCase().includes(kw)
+          })
         },
-        paginatedResults() {
-          const start = (this.resultPage - 1) * this.resultPageSize
+        paginatedResults: function() {
+          var start = (this.resultPage - 1) * this.resultPageSize
           return this.filteredResults.slice(start, start + this.resultPageSize)
-        },
+        }
       },
       watch: {
-        fileSearch() { this.filePage = 1 },
-        filterType() { this.filePage = 1 },
-        resultSearch() { this.resultPage = 1 },
+        fileSearch: function() { this.filePage = 1 },
+        filterType: function() { this.filePage = 1 },
+        resultSearch: function() { this.resultPage = 1 },
+        activeTab: function(val) { this.mode = val }
       },
       methods: {
-        loadSample() {
+        loadSample: function() {
           this.codeContent = this.language === 'java' ? SAMPLE_JAVA : SAMPLE_MYSQL
           this.singleResult = null
         },
-        async analyzeCode() {
+        analyzeCode: function() {
+          var self = this
           if (!this.codeContent.trim()) return
           this.analyzing = true
           this.singleResult = null
-          try {
-            const res = await fetch('/api/code-review', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code: this.codeContent, language: this.language })
-            })
-            this.singleResult = await res.json()
-          } catch (e) {
-            this.$message.error('扫描失败')
-          } finally {
-            this.analyzing = false
-          }
+          fetch('/api/code-review', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: this.codeContent, language: this.language })
+          })
+          .then(function(res) { return res.json() })
+          .then(function(data) { self.singleResult = data })
+          .catch(function() { self.$message && self.$message.error('扫描失败') })
+          .finally(function() { self.analyzing = false })
         },
-        selectFolder() {
+        selectFolder: function() {
           this.$refs.folderInput.click()
         },
-        async handleFolderSelect(e) {
-          const files = e.target.files
+        handleFolderSelect: function(e) {
+          var self = this
+          var files = e.target.files
           if (!files) return
           this.fileList = []
           this.results = {}
           this.selectedFile = null
           this.scannedCount = 0
-          for (let i = 0; i < files.length; i++) {
-            const file = files[i]
-            const ext = file.name.split('.').pop()?.toLowerCase() || ''
-            if (ext === 'java' || ext === 'sql') {
-              const content = await file.text()
-              this.fileList.push({ path: file.webkitRelativePath || file.name, name: file.name, content })
-            }
+          for (var i = 0; i < files.length; i++) {
+            (function(file) {
+              var ext = file.name.split('.').pop() ? file.name.split('.').pop().toLowerCase() : ''
+              if (ext === 'java' || ext === 'sql') {
+                file.text().then(function(content) {
+                  self.fileList.push({ path: file.webkitRelativePath || file.name, name: file.name, content: content })
+                  if (self.fileList.length === 1) self.selectedFile = self.fileList[0].path
+                })
+              }
+            })(files[i])
           }
-          if (this.fileList.length > 0) this.selectedFile = this.fileList[0].path
         },
-        selectFile(file) {
+        selectFile: function(file) {
           this.selectedFile = file.path
         },
-        async analyzeAll() {
+        analyzeAll: function() {
+          var self = this
           if (this.fileList.length === 0) return
           this.analyzing = true
           this.results = {}
           this.scannedCount = 0
-          for (const file of this.fileList) {
-            const lang = file.name.endsWith('.sql') ? 'mysql' : 'java'
-            try {
-              const res = await fetch('/api/code-review', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: file.content, language: lang })
-              })
-              const data = await res.json()
-              Vue.set(this.results, file.path, { issues: data.issues || [], summary: data.summary || {} })
-            } catch (e) {
-              Vue.set(this.results, file.path, { issues: [], summary: {} })
-            }
-            this.scannedCount++
-          }
-          this.analyzing = false
+          var count = 0
+          this.fileList.forEach(function(file) {
+            var lang = file.name.endsWith('.sql') ? 'mysql' : 'java'
+            fetch('/api/code-review', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code: file.content, language: lang })
+            })
+            .then(function(res) { return res.json() })
+            .then(function(data) {
+              self.$set(self.results, file.path, { issues: data.issues || [], summary: data.summary || {} })
+            })
+            .catch(function() {
+              self.$set(self.results, file.path, { issues: [], summary: {} })
+            })
+            .finally(function() {
+              count++
+              self.scannedCount = count
+              if (count === self.fileList.length) self.analyzing = false
+            })
+          })
         },
-        filePageChange(page) { this.filePage = page },
-        resultPageChange(page) { this.resultPage = page },
-      },
-      watch: {
-        activeTab(val) { this.mode = val }
+        filePageChange: function(page) { this.filePage = page },
+        resultPageChange: function(page) { this.resultPage = page }
       }
     })
   </script>
