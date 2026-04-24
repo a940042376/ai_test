@@ -66,19 +66,20 @@
     .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #fff; border: 1px solid #eee; border-radius: 4px; }
     .code-preview pre { margin: 0; background: transparent; }
     .code-preview code { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.5; }
-    .code-editor { height: 200px; overflow: hidden; border-radius: 4px; border: 1px solid #dcdfe6; }
-    .code-editor-wrap { position: relative; height: 100%; background: #fff; }
+    .code-editor { height: 200px; border-radius: 4px; border: 1px solid #dcdfe6; background: #fff; }
+    .code-editor-inner { position: relative; height: 100%; }
     .code-editor textarea { 
-      width: 100%; height: 100%; padding: 12px; border: none; resize: none; 
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; 
-      line-height: 1.5; background: transparent; color: #333; outline: none;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 12px; 
+      border: none; resize: none; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; 
+      font-size: 13px; line-height: 1.5; background: transparent; color: transparent; caret-color: #333;
+      outline: none; z-index: 1; white-space: pre; overflow: auto; box-sizing: border-box;
     }
-    .code-highlight {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 12px; 
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; 
-      line-height: 1.5; pointer-events: none; overflow: auto; background: #fff;
+    .code-editor .highlight-layer {
+      position: absolute; top: 0; left: 0; padding: 12px; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; 
+      font-size: 13px; line-height: 1.5; pointer-events: none; white-space: pre; overflow: hidden;
+      box-sizing: border-box; z-index: 0; background: #fff; color: #333;
     }
-    .code-highlight code { display: block; white-space: pre-wrap; word-wrap: break-word; }
+    .code-editor .highlight-layer code { display: block; white-space: pre; }
     .results-container { margin-top: 16px; }
     .tab-tip { padding: 8px 16px; background: #f0f9eb; color: #67c23a; font-size: 13px; border-bottom: 1px solid #e1f3d8; margin-bottom: -1px; }
   </style>
@@ -104,29 +105,24 @@
           </el-select>
         </div>
         <div class="code-editor">
-          <textarea 
-            v-model="codeContent" 
-            :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'"
-            spellcheck="false"
-            id="codeInput"
-          ></textarea>
+          <div class="code-editor-inner">
+            <textarea 
+              ref="codeTextarea"
+              v-model="codeContent" 
+              :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'"
+              spellcheck="false"
+              @scroll="syncScroll"
+            ></textarea>
+            <pre class="highlight-layer"><code :class="'language-' + language" v-html="highlightedCode"></code></pre>
+          </div>
         </div>
         <div class="footer">
           <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">
             {{ analyzing ? '扫描中...' : '开始扫描' }}
           </el-button>
           <el-button @click="loadSample">加载示例</el-button>
-          <el-button @click="showPreview = !showPreview">预览高亮</el-button>
         </div>
       </div>
-
-      <!-- 代码预览 -->
-      <el-card v-if="mode === 'code' && showPreview && codeContent" class="panel">
-        <template #header>代码预览</template>
-        <div class="code-preview">
-          <pre><code :class="'language-' + language" v-html="highlightedPreview"></code></pre>
-        </div>
-      </el-card>
 
       <!-- 文件夹扫描 -->
       <div v-else>
@@ -394,8 +390,7 @@
           resultPageSize: 20,
           fileSearch: '',
           filterType: '',
-          resultSearch: '',
-          showPreview: false
+          resultSearch: ''
         }
       },
       computed: {
@@ -418,7 +413,7 @@
           if (!this.selectedFileContent) return ''
           return this.highlightCode(this.selectedFileContent, this.selectedFileLanguage)
         },
-        highlightedPreview: function() {
+        highlightedCode: function() {
           return this.highlightCode(this.codeContent, this.language)
         },
         filteredFiles: function() {
@@ -492,10 +487,16 @@
             return code
           }
         },
+        syncScroll: function(e) {
+          var layer = e.target.nextElementSibling
+          if (layer) {
+            layer.scrollTop = e.target.scrollTop
+            layer.scrollLeft = e.target.scrollLeft
+          }
+        },
         loadSample: function() {
           this.codeContent = this.language === 'java' ? SAMPLE_JAVA : SAMPLE_MYSQL
           this.singleResult = null
-          this.showPreview = true
         },
         analyzeCode: function() {
           var self = this
