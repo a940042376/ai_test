@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>代码审视工具</title>
   <link rel="stylesheet" href="/lib/element-ui.css">
-  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
@@ -63,23 +63,22 @@
     .empty-state { padding: 60px; text-align: center; color: #999; }
     .empty-state i { font-size: 48px; color: #ddd; margin-bottom: 16px; }
     .pagination { padding: 12px 16px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; }
-    .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #282c34; }
-    .code-preview pre { margin: 0; }
+    .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #fff; border: 1px solid #eee; border-radius: 4px; }
+    .code-preview pre { margin: 0; background: transparent; }
     .code-preview code { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.5; }
-    .code-editor { height: 200px; background: #282c34; overflow: hidden; border-radius: 0 0 4px 4px; }
+    .code-editor { height: 200px; overflow: hidden; border-radius: 4px; border: 1px solid #dcdfe6; }
+    .code-editor-wrap { position: relative; height: 100%; background: #fff; }
     .code-editor textarea { 
       width: 100%; height: 100%; padding: 12px; border: none; resize: none; 
       font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; 
-      line-height: 1.5; background: transparent; color: #abb2bf; 
-      position: relative; z-index: 1; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      line-height: 1.5; background: transparent; color: #333; outline: none;
     }
-    .code-editor .highlight-bg {
+    .code-highlight {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 12px; 
       font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; 
-      line-height: 1.5; pointer-events: none; white-space: pre-wrap; word-wrap: break-word;
+      line-height: 1.5; pointer-events: none; overflow: auto; background: #fff;
     }
-    .code-editor .highlight-bg code { display: block; }
-    .code-editor-wrap { position: relative; height: 100%; }
+    .code-highlight code { display: block; white-space: pre-wrap; word-wrap: break-word; }
     .results-container { margin-top: 16px; }
     .tab-tip { padding: 8px 16px; background: #f0f9eb; color: #67c23a; font-size: 13px; border-bottom: 1px solid #e1f3d8; margin-bottom: -1px; }
   </style>
@@ -104,24 +103,30 @@
             <el-option label="MySQL" value="mysql"></el-option>
           </el-select>
         </div>
-        <div class="code-editor-wrap">
+        <div class="code-editor">
           <textarea 
-            ref="codeInput"
             v-model="codeContent" 
             :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'"
             spellcheck="false"
-            @input="updateHighlight"
-            @scroll="syncScroll"
+            id="codeInput"
           ></textarea>
-          <pre class="highlight-bg"><code :class="'language-' + language" v-html="highlightedCode"></code></pre>
         </div>
         <div class="footer">
           <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">
             {{ analyzing ? '扫描中...' : '开始扫描' }}
           </el-button>
           <el-button @click="loadSample">加载示例</el-button>
+          <el-button @click="showPreview = !showPreview">预览高亮</el-button>
         </div>
       </div>
+
+      <!-- 代码预览 -->
+      <el-card v-if="mode === 'code' && showPreview && codeContent" class="panel">
+        <template #header>代码预览</template>
+        <div class="code-preview">
+          <pre><code :class="'language-' + language" v-html="highlightedPreview"></code></pre>
+        </div>
+      </el-card>
 
       <!-- 文件夹扫描 -->
       <div v-else>
@@ -389,7 +394,8 @@
           resultPageSize: 20,
           fileSearch: '',
           filterType: '',
-          resultSearch: ''
+          resultSearch: '',
+          showPreview: false
         }
       },
       computed: {
@@ -412,7 +418,7 @@
           if (!this.selectedFileContent) return ''
           return this.highlightCode(this.selectedFileContent, this.selectedFileLanguage)
         },
-        highlightedCode: function() {
+        highlightedPreview: function() {
           return this.highlightCode(this.codeContent, this.language)
         },
         filteredFiles: function() {
@@ -486,21 +492,10 @@
             return code
           }
         },
-        updateHighlight: function() {
-          this.$nextTick(function() {
-            hljs.highlightAll()
-          })
-        },
-        syncScroll: function(e) {
-          var pre = e.target.nextElementSibling
-          if (pre) {
-            pre.scrollTop = e.target.scrollTop
-            pre.scrollLeft = e.target.scrollLeft
-          }
-        },
         loadSample: function() {
           this.codeContent = this.language === 'java' ? SAMPLE_JAVA : SAMPLE_MYSQL
           this.singleResult = null
+          this.showPreview = true
         },
         analyzeCode: function() {
           var self = this
