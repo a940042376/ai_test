@@ -28,12 +28,28 @@
     .file-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; flex-shrink: 0; }
     .badge-error { background: #fef0f0; color: #f56c6c; }
     .badge-success { background: #f0f9eb; color: #67c23a; }
-    .editor { height: 200px; background: #282c34; }
-    .editor textarea { width: 100%; height: 100%; padding: 16px; border: none; resize: none; font-family: monospace; font-size: 13px; line-height: 1.5; background: #282c34; color: #abb2bf; }
-    .editor textarea:focus { outline: none; }
+    .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #fff; border: 1px solid #eee; border-radius: 4px; }
+    .code-preview pre { margin: 0; background: transparent; }
+    .code-preview code { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.5; }
+    .code-editor { height: 200px; border-radius: 4px; border: 1px solid #dcdfe6; background: #fff; }
+    .code-editor-inner { position: relative; height: 100%; }
+    .code-editor textarea { 
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 12px; 
+      border: none; resize: none; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; 
+      font-size: 13px; line-height: 1.5; background: transparent; color: transparent; caret-color: #333;
+      outline: none; z-index: 1; white-space: pre; overflow: auto; box-sizing: border-box;
+    }
+    .code-editor .highlight-layer {
+      position: absolute; top: 0; left: 0; padding: 12px; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; 
+      font-size: 13px; line-height: 1.5; pointer-events: none; white-space: pre; overflow: hidden;
+      box-sizing: border-box; z-index: 0; background: #fff; color: #333;
+    }
+    .code-editor .highlight-layer code { display: block; white-space: pre; }
     .footer { padding: 12px 16px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 12px; }
     .summary { display: flex; gap: 16px; margin-bottom: 16px; }
-    .summary-item { background: #fff; padding: 16px 24px; border-radius: 4px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex: 1; }
+    .summary-item { background: #fff; padding: 16px 24px; border-radius: 4px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); flex: 1; cursor: pointer; transition: all 0.2s; }
+    .summary-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); transform: translateY(-1px); }
+    .summary-item.active { border: 2px solid #409eff; background: #ecf5ff; }
     .summary-item .num { font-size: 28px; font-weight: 600; }
     .summary-item .label { font-size: 12px; color: #999; margin-top: 4px; }
     .num-error { color: #e74c3c; }
@@ -56,30 +72,13 @@
     .tag-info { background: #e6f4ff; color: #3498db; }
     .tag-category { background: #f5f5f5; color: #666; }
     .line-num { color: #999; font-size: 12px; }
-    .diff { margin-top: 10px; padding: 10px; background: #1e1e1e; border-radius: 4px; }
+    .diff { margin-top: 10px; padding: 10px; background: #f6f8fa; border-radius: 4px; border-left: 3px solid #eee; }
     .diff-before { color: #e74c3c; font-size: 12px; margin-bottom: 6px; }
     .diff-after { color: #2ecc71; font-size: 12px; }
-    .diff pre { font-family: monospace; margin-top: 4px; color: #ccc; white-space: pre-wrap; word-break: break-all; }
+    .diff pre { font-family: monospace; margin-top: 4px; color: #333; white-space: pre-wrap; word-break: break-all; }
     .empty-state { padding: 60px; text-align: center; color: #999; }
     .empty-state i { font-size: 48px; color: #ddd; margin-bottom: 16px; }
     .pagination { padding: 12px 16px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; }
-    .code-preview { max-height: 200px; overflow: auto; padding: 12px; background: #fff; border: 1px solid #eee; border-radius: 4px; }
-    .code-preview pre { margin: 0; background: transparent; }
-    .code-preview code { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; font-size: 13px; line-height: 1.5; }
-    .code-editor { height: 200px; border-radius: 4px; border: 1px solid #dcdfe6; background: #fff; }
-    .code-editor-inner { position: relative; height: 100%; }
-    .code-editor textarea { 
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 12px; 
-      border: none; resize: none; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; 
-      font-size: 13px; line-height: 1.5; background: transparent; color: transparent; caret-color: #333;
-      outline: none; z-index: 1; white-space: pre; overflow: auto; box-sizing: border-box;
-    }
-    .code-editor .highlight-layer {
-      position: absolute; top: 0; left: 0; padding: 12px; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; 
-      font-size: 13px; line-height: 1.5; pointer-events: none; white-space: pre; overflow: hidden;
-      box-sizing: border-box; z-index: 0; background: #fff; color: #333;
-    }
-    .code-editor .highlight-layer code { display: block; white-space: pre; }
     .results-container { margin-top: 16px; }
     .tab-tip { padding: 8px 16px; background: #f0f9eb; color: #67c23a; font-size: 13px; border-bottom: 1px solid #e1f3d8; margin-bottom: -1px; }
   </style>
@@ -92,7 +91,7 @@
     <div class="container">
       <el-tabs v-model="activeTab">
         <el-tab-pane label="代码扫描" name="code"></el-tab-pane>
-        <el-tab-pane label="文件夹扫描" name="folder"></el-tab-pane>
+        <el-tab-pane label="文件扫描" name="folder"></el-tab-pane>
       </el-tabs>
 
       <!-- 代码扫描 -->
@@ -106,42 +105,89 @@
         </div>
         <div class="code-editor">
           <div class="code-editor-inner">
-            <textarea 
-              ref="codeTextarea"
-              v-model="codeContent" 
-              :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'"
-              spellcheck="false"
-              @scroll="syncScroll"
-            ></textarea>
+            <textarea ref="codeTextarea" v-model="codeContent" :placeholder="'输入 ' + (language === 'java' ? 'Java' : 'MySQL') + ' 代码...'" spellcheck="false" @scroll="syncScroll"></textarea>
             <pre class="highlight-layer"><code :class="'language-' + language" v-html="highlightedCode"></code></pre>
           </div>
         </div>
         <div class="footer">
-          <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">
-            {{ analyzing ? '扫描中...' : '开始扫描' }}
-          </el-button>
+          <el-button type="primary" :loading="analyzing" @click="analyzeCode" :disabled="!codeContent.trim()">{{ analyzing ? '扫描中...' : '开始扫描' }}</el-button>
           <el-button @click="loadSample">加载示例</el-button>
         </div>
       </div>
 
-      <!-- 文件夹扫描 -->
-      <div v-else>
-        <div class="tab-tip" v-if="fileList.length === 0">
-          点击上方「选择文件夹」按钮添加文件，或点击「加载示例」查看示例
+      <!-- 统计 + 结果 -->
+      <div v-if="mode === 'code' && singleResult && singleResult.issues.length > 0" class="results-container">
+        <div class="summary">
+          <div class="summary-item" :class="{ active: filterSeverity === '' }" @click="setFilterSeverity('')">
+            <div class="num">{{ singleResult.summary.total }}</div>
+            <div class="label">问题总数</div>
+          </div>
+          <div class="summary-item" :class="{ active: filterSeverity === 'error' }" @click="setFilterSeverity('error')">
+            <div class="num num-error">{{ singleResult.summary.errors }}</div>
+            <div class="label">错误</div>
+          </div>
+          <div class="summary-item" :class="{ active: filterSeverity === 'warning' }" @click="setFilterSeverity('warning')">
+            <div class="num num-warn">{{ singleResult.summary.warnings }}</div>
+            <div class="label">警告</div>
+          </div>
+          <div class="summary-item" :class="{ active: filterSeverity === 'info' }" @click="setFilterSeverity('info')">
+            <div class="num num-info">{{ singleResult.summary.suggestions }}</div>
+            <div class="label">建议</div>
+          </div>
         </div>
+        <div class="panel">
+          <div class="panel-header">扫描结果 ({{ filteredCodeResults.length }})</div>
+          <div v-if="filteredCodeResults.length === 0" class="empty-state"><p>无匹配结果</p></div>
+          <div v-else>
+            <div v-for="(issue, index) in paginatedCodeResults" :key="index" class="issue">
+              <div class="issue-header">
+                <div class="issue-icon" :class="'icon-' + issue.severity">
+                  <span v-if="issue.severity === 'error'">✕</span>
+                  <span v-else-if="issue.severity === 'warning'">!</span>
+                  <span v-else>ℹ</span>
+                </div>
+                <div class="issue-content">
+                  <div class="issue-meta">
+                    <span class="tag" :class="'tag-' + issue.severity">{{ getSeverityText(issue.severity) }}</span>
+                    <span class="line-num">行 {{ issue.line }}</span>
+                    <span class="tag tag-category">{{ issue.category }}</span>
+                  </div>
+                  <div class="issue-msg">{{ issue.message }}</div>
+                  <div class="issue-sug">{{ issue.suggestion }}</div>
+                  <div v-if="issue.beforeCode" class="diff">
+                    <div class="diff-before">修改前: <pre>{{ issue.beforeCode }}</pre></div>
+                    <div class="diff-after">修改后: <pre>{{ issue.afterCode }}</pre></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="pagination" v-if="filteredCodeResults.length > codeResultPageSize">
+            <el-pagination @current-change="codeResultPageChange" :current-page="codeResultPage" :page-size="codeResultPageSize" :total="filteredCodeResults.length" layout="prev, pager, next" small></el-pagination>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="mode === 'code' && singleResult && singleResult.issues.length === 0" class="panel results-container">
+        <div style="padding: 40px; text-align: center;">
+          <div style="font-size: 48px; color: #2ecc71; margin-bottom: 16px;">✓</div>
+          <div style="font-size: 16px; color: #333;">扫描通过，未发现问题</div>
+        </div>
+      </div>
+
+      <!-- 文件扫描 -->
+      <div v-else>
+        <div class="tab-tip" v-if="fileList.length === 0">点击上方「选择文件夹」按钮添加文件，或点击「加载示例」查看示例</div>
 
         <div class="panel" style="margin-bottom: 16px;">
           <div class="panel-header">
             <span>文件列表</span>
             <div>
               <el-button size="small" @click="loadFolderSample">加载示例</el-button>
-              <el-button size="small" type="primary" @click="selectFolder">
-                <i class="el-icon-folder-opened"></i> 选择文件夹
-              </el-button>
+              <el-button size="small" type="primary" @click="selectFolder"><i class="el-icon-folder-opened"></i> 选择文件夹</el-button>
             </div>
             <input ref="folderInput" type="file" webkitdirectory multiple style="display:none" @change="handleFolderSelect">
           </div>
-          
           <div class="search-bar" v-if="fileList.length > 0">
             <el-input v-model="fileSearch" placeholder="搜索文件名..." prefix-icon="el-icon-search" clearable size="small" style="width: 200px;"></el-input>
             <el-select v-model="filterType" size="small" style="width: 100px;" clearable placeholder="类型">
@@ -151,57 +197,32 @@
             </el-select>
             <span style="color: #999; font-size: 13px;">共 {{ filteredFiles.length }} 个文件</span>
           </div>
-          
-          <div v-if="fileList.length === 0" class="empty-state">
-            <i class="el-icon-folder-opened"></i>
-            <p>暂未选择文件夹</p>
-          </div>
-          
+          <div v-if="fileList.length === 0" class="empty-state"><i class="el-icon-folder-opened"></i><p>暂未选择文件夹</p></div>
           <div v-else class="file-list">
             <div v-for="file in paginatedFiles" :key="file.path" class="file-item" :class="{ active: selectedFile === file.path }" @click="selectFile(file)">
-              <div class="file-icon" :class="file.name.endsWith('.sql') ? 'sql' : 'java'">
-                {{ file.name.endsWith('.sql') ? 'SQL' : 'J' }}
-              </div>
+              <div class="file-icon" :class="file.name.endsWith('.sql') ? 'sql' : 'java'">{{ file.name.endsWith('.sql') ? 'SQL' : 'J' }}</div>
               <div class="file-info">
                 <div class="file-name">{{ file.name }}</div>
                 <div class="file-path">{{ file.path }}</div>
               </div>
-              <span v-if="results[file.path]" class="file-badge" :class="results[file.path].total > 0 ? 'badge-error' : 'badge-success'">
-                {{ results[file.path].total > 0 ? results[file.path].total + ' 问题' : '通过' }}
-              </span>
+              <span v-if="results[file.path]" class="file-badge" :class="results[file.path].total > 0 ? 'badge-error' : 'badge-success'">{{ results[file.path].total > 0 ? results[file.path].total + ' 问题' : '通过' }}</span>
             </div>
           </div>
-          
           <div class="pagination" v-if="filteredFiles.length > filePageSize">
-            <el-pagination
-              @current-change="filePageChange"
-              :current-page="filePage"
-              :page-size="filePageSize"
-              :total="filteredFiles.length"
-              layout="prev, pager, next">
-            </el-pagination>
+            <el-pagination @current-change="filePageChange" :current-page="filePage" :page-size="filePageSize" :total="filteredFiles.length" layout="prev, pager, next" small></el-pagination>
           </div>
-          
           <div class="footer" v-if="fileList.length > 0">
-            <el-button type="primary" :loading="analyzing" @click="analyzeAll" :disabled="fileList.length === 0">
-              {{ analyzing ? '扫描中 (' + scannedCount + '/' + fileList.length + ')' : '开始扫描' }}
-            </el-button>
-            <span v-if="scannedCount > 0 && scannedCount < fileList.length" style="color: #999; font-size: 13px;">
-              已扫描 {{ scannedCount }}/{{ fileList.length }}
-            </span>
-            <span v-if="scannedCount === fileList.length && !analyzing" style="color: #67c23a; font-size: 13px;">
-              扫描完成
-            </span>
+            <el-button type="primary" :loading="analyzing" @click="analyzeAll" :disabled="fileList.length === 0">{{ analyzing ? '扫描中 (' + scannedCount + '/' + fileList.length + ')' : '开始扫描' }}</el-button>
+            <span v-if="scannedCount > 0 && scannedCount < fileList.length" style="color: #999; font-size: 13px;">已扫描 {{ scannedCount }}/{{ fileList.length }}</span>
+            <span v-if="scannedCount === fileList.length && !analyzing" style="color: #67c23a; font-size: 13px;">扫描完成</span>
           </div>
         </div>
 
-        <!-- 选中文件预览 -->
+        <!-- 文件预览 -->
         <div v-if="selectedFile && selectedFileContent" class="panel" style="margin-bottom: 16px;">
           <div class="panel-header">
             <span>{{ selectedFileName }}</span>
-            <el-tag size="small" :type="selectedFile.endsWith('.sql') ? 'primary' : 'warning'">
-              {{ selectedFile.endsWith('.sql') ? 'MySQL' : 'Java' }}
-            </el-tag>
+            <el-tag size="small" :type="selectedFile.endsWith('.sql') ? 'primary' : 'warning'">{{ selectedFile.endsWith('.sql') ? 'MySQL' : 'Java' }}</el-tag>
           </div>
           <div class="code-preview">
             <pre><code :class="'language-' + selectedFileLanguage" v-html="selectedFileHighlighted"></code></pre>
@@ -210,19 +231,19 @@
 
         <!-- 统计 -->
         <div v-if="totalSummary && totalSummary.total > 0" class="summary">
-          <div class="summary-item">
+          <div class="summary-item" :class="{ active: filterSeverity === '' }" @click="setFilterSeverity('')">
             <div class="num">{{ totalSummary.total }}</div>
             <div class="label">问题总数</div>
           </div>
-          <div class="summary-item">
+          <div class="summary-item" :class="{ active: filterSeverity === 'error' }" @click="setFilterSeverity('error')">
             <div class="num num-error">{{ totalSummary.errors }}</div>
             <div class="label">错误</div>
           </div>
-          <div class="summary-item">
+          <div class="summary-item" :class="{ active: filterSeverity === 'warning' }" @click="setFilterSeverity('warning')">
             <div class="num num-warn">{{ totalSummary.warnings }}</div>
             <div class="label">警告</div>
           </div>
-          <div class="summary-item">
+          <div class="summary-item" :class="{ active: filterSeverity === 'info' }" @click="setFilterSeverity('info')">
             <div class="num num-info">{{ totalSummary.suggestions }}</div>
             <div class="label">建议</div>
           </div>
@@ -234,9 +255,7 @@
             <span>扫描结果 ({{ filteredResults.length }} 条)</span>
             <el-input v-model="resultSearch" placeholder="搜索问题内容..." prefix-icon="el-icon-search" size="small" style="width: 200px;" clearable></el-input>
           </div>
-          <div v-if="filteredResults.length === 0" class="empty-state">
-            <p>未找到匹配的问题</p>
-          </div>
+          <div v-if="filteredResults.length === 0" class="empty-state"><p>未找到匹配的问题</p></div>
           <div v-else>
             <div v-for="(issue, index) in paginatedResults" :key="index" class="issue">
               <div class="issue-header">
@@ -247,7 +266,7 @@
                 </div>
                 <div class="issue-content">
                   <div class="issue-meta">
-                    <span class="tag" :class="'tag-' + issue.severity">{{ issue.severity === 'error' ? '错误' : issue.severity === 'warning' ? '警告' : '建议' }}</span>
+                    <span class="tag" :class="'tag-' + issue.severity">{{ getSeverityText(issue.severity) }}</span>
                     <span class="line-num">{{ issue.file }}</span>
                     <span class="line-num">行 {{ issue.line }}</span>
                     <span class="tag tag-category">{{ issue.category }}</span>
@@ -263,13 +282,7 @@
             </div>
           </div>
           <div class="pagination" v-if="filteredResults.length > resultPageSize">
-            <el-pagination
-              @current-change="resultPageChange"
-              :current-page="resultPage"
-              :page-size="resultPageSize"
-              :total="filteredResults.length"
-              layout="prev, pager, next">
-            </el-pagination>
+            <el-pagination @current-change="resultPageChange" :current-page="resultPage" :page-size="resultPageSize" :total="filteredResults.length" layout="prev, pager, next" small></el-pagination>
           </div>
         </div>
 
@@ -280,325 +293,143 @@
           </div>
         </div>
       </div>
-
-      <!-- 代码扫描结果 -->
-      <div v-if="mode === 'code' && singleResult && singleResult.issues.length > 0" class="results-container">
-        <div class="summary">
-          <div class="summary-item">
-            <div class="num">{{ singleResult.summary.total }}</div>
-            <div class="label">问题总数</div>
-          </div>
-          <div class="summary-item">
-            <div class="num num-error">{{ singleResult.summary.errors }}</div>
-            <div class="label">错误</div>
-          </div>
-          <div class="summary-item">
-            <div class="num num-warn">{{ singleResult.summary.warnings }}</div>
-            <div class="label">警告</div>
-          </div>
-          <div class="summary-item">
-            <div class="num num-info">{{ singleResult.summary.suggestions }}</div>
-            <div class="label">建议</div>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="panel-header">扫描结果 ({{ singleResult.issues.length }})</div>
-          <div v-for="(issue, index) in singleResult.issues" :key="index" class="issue">
-            <div class="issue-header">
-              <div class="issue-icon" :class="'icon-' + issue.severity">
-                <span v-if="issue.severity === 'error'">✕</span>
-                <span v-else-if="issue.severity === 'warning'">!</span>
-                <span v-else>ℹ</span>
-              </div>
-              <div class="issue-content">
-                <div class="issue-meta">
-                  <span class="tag" :class="'tag-' + issue.severity">{{ issue.severity === 'error' ? '错误' : issue.severity === 'warning' ? '警告' : '建议' }}</span>
-                  <span class="line-num">行 {{ issue.line }}</span>
-                  <span class="tag tag-category">{{ issue.category }}</span>
-                </div>
-                <div class="issue-msg">{{ issue.message }}</div>
-                <div class="issue-sug">{{ issue.suggestion }}</div>
-                <div v-if="issue.beforeCode" class="diff">
-                  <div class="diff-before">修改前: <pre>{{ issue.beforeCode }}</pre></div>
-                  <div class="diff-after">修改后: <pre>{{ issue.afterCode }}</pre></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="mode === 'code' && singleResult && singleResult.issues.length === 0" class="panel results-container">
-        <div style="padding: 40px; text-align: center;">
-          <div style="font-size: 48px; color: #2ecc71; margin-bottom: 16px;">✓</div>
-          <div style="font-size: 16px; color: #333;">扫描通过，未发现问题</div>
-        </div>
-      </div>
     </div>
   </div>
 
   <script src="/lib/vue.min.js"></script>
   <script src="/lib/element-ui.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script src="https://cdn.bootcdn.net/ajax/libs/highlightjs-nsql/1.0.0/nsql.min.js"></script>
   <script>
     var SAMPLE_JAVA = 'public class UserService {\n    private int A = 10/0;\n    private StringBuilder sb = null;\n    public void getUser(Long id) {\n        String query = "SELECT * FROM users WHERE id = " + id;\n        if (valid) doSomething();\n    }\n}';
-
     var SAMPLE_MYSQL = 'SELECT * FROM orders WHERE status = \'pending\';\nSELECT * FROM orders, customers WHERE orders.customer_id = customers.id;\nSELECT id, username, password FROM users;';
 
-    // 文件夹扫描示例文件
     var SAMPLE_FILES = [
-      {
-        path: 'demo/UserService.java',
-        name: 'UserService.java',
-        content: 'package com.example.service;\n\nimport java.sql.*;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class UserService {\n    // 命名规范问题：变量名大写开头\n    private int Number = 100;\n    private String Name = "admin";\n    \n    // SQL注入风险\n    public User getUserById(Long id) throws SQLException {\n        String query = "SELECT * FROM users WHERE id = " + id;\n        Statement stmt = connection.createStatement();\n        ResultSet rs = stmt.executeQuery(query);\n        if (rs.next()) {\n            return new User(rs.getString("name"));\n        }\n        return null;\n    }\n    \n    // 空指针风险\n    public String processData(String data) {\n        StringBuilder sb = null;\n        sb.append(data.toUpperCase());\n        return sb.toString();\n    }\n    \n    // 硬编码密码\n    private String password = "123456";\n    \n    // if语句缺少大括号\n    public void checkStatus(boolean valid) {\n        if (valid)\n            doSomething();\n    }\n    \n    // 基本类型POJO属性\n    private int count;\n    private boolean isActive;\n    \n    // 生吞异常\n    public void updateUser(User user) {\n        try {\n            conn.prepareStatement(UPDATE_SQL);\n        } catch (Exception e) {\n            // 生吞异常\n        }\n    }\n    \n    private Connection connection;\n}'
-      },
-      {
-        path: 'demo/OrderMapper.java',
-        name: 'OrderMapper.java',
-        content: 'package com.example.mapper;\n\nimport java.util.*;\n\npublic class OrderMapper {\n    // 除零错误\n    public int calculate(int total, int count) {\n        return total / count;\n    }\n    \n    // 隐式类型转换\n    public double average(int total, int count) {\n        return total / count;\n    }\n    \n    // Collection转数组错误\n    public String[] getNames(List<String> names) {\n        return names.toArray();\n    }\n    \n    // Map遍历效率问题\n    public void printMap(Map<String, String> map) {\n        for (String key : map.keySet()) {\n            System.out.println(key + ": " + map.get(key));\n        }\n    }\n    \n    // switch缺少default\n    public String getStatus(int type) {\n        switch (type) {\n            case 1: return "pending";\n            case 2: return "completed";\n        }\n        return "unknown";\n    }\n}'
-      },
-      {
-        path: 'demo/init.sql',
-        name: 'init.sql',
-        content: '-- MySQL规范示例\n\n-- 1. SELECT * 性能问题\nSELECT * FROM orders WHERE status = \'pending\';\n\n-- 2. 隐式连接\nSELECT * FROM orders, customers WHERE orders.customer_id = customers.id;\n\n-- 3. 密码字段明文\nSELECT id, username, password FROM users;\n\n-- 4. 建议使用显式JOIN\nSELECT o.id, o.order_no, c.name as customer_name\nFROM orders o\nINNER JOIN customers c ON o.customer_id = c.id\nWHERE o.status = \'completed\';'
-      },
-      {
-        path: 'demo/ProductDAO.java',
-        name: 'ProductDAO.java',
-        content: 'package com.example.dao;\n\npublic class ProductDAO {\n    // 线程安全问题\n    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");\n    \n    // volatile不能保证原子性\n    private volatile long counter;\n    \n    // 资源未关闭\n    public ResultSet query(String sql) throws SQLException {\n        Connection conn = dataSource.getConnection();\n        Statement stmt = conn.createStatement();\n        return stmt.executeQuery(sql);\n    }\n    \n    // equals参数顺序问题\n    public boolean validate(String input) {\n        return input.equals(password);\n    }\n    \n    // 空catch块\n    public void save(Object data) {\n        try {\n            // 保存逻辑\n        } catch (Exception e) {\n            \n        }\n    }\n}'
-      }
+      { path: 'demo/UserService.java', name: 'UserService.java', content: 'package com.example.service;\n\npublic class UserService {\n    private int Number = 100;\n    private String Name = "admin";\n    \n    public User getUserById(Long id) {\n        String query = "SELECT * FROM users WHERE id = " + id;\n        return new User(rs.getString("name"));\n    }\n    \n    public String processData(String data) {\n        StringBuilder sb = null;\n        sb.append(data.toUpperCase());\n        return sb.toString();\n    }\n    \n    private String password = "123456";\n    \n    public void checkStatus(boolean valid) {\n        if (valid)\n            doSomething();\n    }\n    \n    private int count;\n    private boolean isActive;\n    \n    public void updateUser(User user) {\n        try {\n            conn.prepareStatement(UPDATE_SQL);\n        } catch (Exception e) {\n            // 生吞异常\n        }\n    }\n}' },
+      { path: 'demo/OrderMapper.java', name: 'OrderMapper.java', content: 'package com.example.mapper;\n\npublic class OrderMapper {\n    public int calculate(int total, int count) {\n        return total / count;\n    }\n    \n    public String[] getNames(List<String> names) {\n        return names.toArray();\n    }\n    \n    public void printMap(Map<String, String> map) {\n        for (String key : map.keySet()) {\n            System.out.println(key + ": " + map.get(key));\n        }\n    }\n}' },
+      { path: 'demo/init.sql', name: 'init.sql', content: '-- MySQL规范示例\n\nSELECT * FROM orders WHERE status = \'pending\';\n\nSELECT * FROM orders, customers WHERE orders.customer_id = customers.id;\n\nSELECT id, username, password FROM users;' },
+      { path: 'demo/ProductDAO.java', name: 'ProductDAO.java', content: 'package com.example.dao;\n\npublic class ProductDAO {\n    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");\n    private volatile long counter;\n    \n    public ResultSet query(String sql) throws SQLException {\n        Connection conn = dataSource.getConnection();\n        Statement stmt = conn.createStatement();\n        return stmt.executeQuery(sql);\n    }\n    \n    public boolean validate(String input) {\n        return input.equals(password);\n    }\n}' }
     ];
 
     new Vue({
       el: '#app',
       data: function() {
         return {
-          activeTab: 'code',
-          mode: 'code',
-          language: 'java',
-          codeContent: '',
-          singleResult: null,
-          fileList: [],
-          selectedFile: null,
-          results: {},
-          analyzing: false,
-          scannedCount: 0,
-          filePage: 1,
-          filePageSize: 15,
-          resultPage: 1,
-          resultPageSize: 20,
-          fileSearch: '',
-          filterType: '',
-          resultSearch: ''
+          activeTab: 'code', mode: 'code', language: 'java', codeContent: '', singleResult: null,
+          fileList: [], selectedFile: null, results: {}, analyzing: false, scannedCount: 0,
+          filePage: 1, filePageSize: 15, resultPage: 1, resultPageSize: 20, codeResultPage: 1, codeResultPageSize: 20,
+          fileSearch: '', filterType: '', resultSearch: '', filterSeverity: ''
         }
       },
       computed: {
-        selectedFileName: function() {
-          if (!this.selectedFile) return ''
-          return this.selectedFile.split('/').pop() || this.selectedFile
-        },
+        selectedFileName: function() { return this.selectedFile ? (this.selectedFile.split('/').pop() || this.selectedFile) : '' },
         selectedFileContent: function() {
-          if (!this.selectedFile) return ''
-          for (var i = 0; i < this.fileList.length; i++) {
-            if (this.fileList[i].path === this.selectedFile) return this.fileList[i].content
-          }
-          return ''
+          if (!this.selectedFile) return '';
+          for (var i = 0; i < this.fileList.length; i++) { if (this.fileList[i].path === this.selectedFile) return this.fileList[i].content; }
+          return '';
         },
-        selectedFileLanguage: function() {
-          if (!this.selectedFile) return 'java'
-          return this.selectedFile.endsWith('.sql') ? 'sql' : 'java'
-        },
-        selectedFileHighlighted: function() {
-          if (!this.selectedFileContent) return ''
-          return this.highlightCode(this.selectedFileContent, this.selectedFileLanguage)
-        },
-        highlightedCode: function() {
-          return this.highlightCode(this.codeContent, this.language)
-        },
+        selectedFileLanguage: function() { return this.selectedFile ? (this.selectedFile.endsWith('.sql') ? 'sql' : 'java') : 'java' },
+        selectedFileHighlighted: function() { return this.highlightCode(this.selectedFileContent, this.selectedFileLanguage) },
+        highlightedCode: function() { return this.highlightCode(this.codeContent, this.language) },
         filteredFiles: function() {
-          var files = this.fileList
-          if (this.fileSearch) {
-            var kw = this.fileSearch.toLowerCase()
-            files = files.filter(function(f) { return f.name.toLowerCase().indexOf(kw) !== -1 })
-          }
-          if (this.filterType) {
-            files = files.filter(function(f) { return f.name.endsWith('.' + this.filterType) }, this)
-          }
-          return files
+          var files = this.fileList;
+          if (this.fileSearch) { var kw = this.fileSearch.toLowerCase(); files = files.filter(function(f) { return f.name.toLowerCase().indexOf(kw) !== -1; }); }
+          if (this.filterType) { files = files.filter(function(f) { return f.name.endsWith('.' + this.filterType); }, this); }
+          return files;
         },
-        paginatedFiles: function() {
-          var start = (this.filePage - 1) * this.filePageSize
-          return this.filteredFiles.slice(start, start + this.filePageSize)
-        },
+        paginatedFiles: function() { var start = (this.filePage - 1) * this.filePageSize; return this.filteredFiles.slice(start, start + this.filePageSize); },
         totalSummary: function() {
-          if (Object.keys(this.results).length === 0) return null
-          var total = { total: 0, errors: 0, warnings: 0, suggestions: 0 }
-          for (var key in this.results) {
-            var r = this.results[key].summary || {}
-            total.total += r.total || 0
-            total.errors += r.errors || 0
-            total.warnings += r.warnings || 0
-            total.suggestions += r.suggestions || 0
-          }
-          return total
+          if (Object.keys(this.results).length === 0) return null;
+          var total = { total: 0, errors: 0, warnings: 0, suggestions: 0 };
+          for (var key in this.results) { var r = this.results[key].summary || {}; total.total += r.total || 0; total.errors += r.errors || 0; total.warnings += r.warnings || 0; total.suggestions += r.suggestions || 0; }
+          return total;
         },
         allResults: function() {
-          var results = []
+          var results = [];
           for (var key in this.results) {
-            var fileName = key.split('/').pop()
-            var issues = this.results[key].issues || []
-            for (var i = 0; i < issues.length; i++) {
-              var issue = issues[i]
-              issue.file = fileName
-              results.push(issue)
-            }
+            var fileName = key.split('/').pop();
+            var issues = this.results[key].issues || [];
+            for (var i = 0; i < issues.length; i++) { var issue = issues[i]; issue.file = fileName; results.push(issue); }
           }
-          return results
+          return results;
         },
         filteredResults: function() {
-          if (!this.resultSearch) return this.allResults
-          var kw = this.resultSearch.toLowerCase()
-          return this.allResults.filter(function(r) {
-            return r.message.toLowerCase().indexOf(kw) !== -1 ||
-              r.suggestion.toLowerCase().indexOf(kw) !== -1 ||
-              r.file.toLowerCase().indexOf(kw) !== -1
-          })
+          var results = this.allResults;
+          if (this.filterSeverity) { results = results.filter(function(r) { return r.severity === this.filterSeverity; }, this); }
+          if (this.resultSearch) { var kw = this.resultSearch.toLowerCase(); results = results.filter(function(r) { return r.message.toLowerCase().indexOf(kw) !== -1 || r.suggestion.toLowerCase().indexOf(kw) !== -1 || r.file.toLowerCase().indexOf(kw) !== -1; }); }
+          return results;
         },
-        paginatedResults: function() {
-          var start = (this.resultPage - 1) * this.resultPageSize
-          return this.filteredResults.slice(start, start + this.resultPageSize)
-        }
+        paginatedResults: function() { var start = (this.resultPage - 1) * this.resultPageSize; return this.filteredResults.slice(start, start + this.resultPageSize); },
+        filteredCodeResults: function() {
+          if (!this.singleResult || !this.singleResult.issues) return [];
+          var issues = this.singleResult.issues;
+          if (this.filterSeverity) { issues = issues.filter(function(r) { return r.severity === this.filterSeverity; }, this); }
+          return issues;
+        },
+        paginatedCodeResults: function() { var start = (this.codeResultPage - 1) * this.codeResultPageSize; return this.filteredCodeResults.slice(start, start + this.codeResultPageSize); }
       },
       watch: {
-        fileSearch: function() { this.filePage = 1 },
-        filterType: function() { this.filePage = 1 },
-        resultSearch: function() { this.resultPage = 1 },
-        activeTab: function(val) { this.mode = val }
+        fileSearch: function() { this.filePage = 1; },
+        filterType: function() { this.filePage = 1; },
+        resultSearch: function() { this.resultPage = 1; },
+        filterSeverity: function() { this.codeResultPage = 1; this.resultPage = 1; },
+        activeTab: function(val) { this.mode = val; this.filterSeverity = ''; }
       },
       methods: {
         highlightCode: function(code, lang) {
-          if (!code) return ''
-          try {
-            if (lang === 'mysql') lang = 'sql'
-            var result = hljs.highlight(code, { language: lang, ignoreIllegals: true })
-            return result.value || code
-          } catch (e) {
-            return code
-          }
+          if (!code) return '';
+          try { if (lang === 'mysql') lang = 'sql'; var result = hljs.highlight(code, { language: lang, ignoreIllegals: true }); return result.value || code; } catch (e) { return code; }
         },
-        syncScroll: function(e) {
-          var layer = e.target.nextElementSibling
-          if (layer) {
-            layer.scrollTop = e.target.scrollTop
-            layer.scrollLeft = e.target.scrollLeft
-          }
-        },
-        loadSample: function() {
-          this.codeContent = this.language === 'java' ? SAMPLE_JAVA : SAMPLE_MYSQL
-          this.singleResult = null
-        },
+        syncScroll: function(e) { var layer = e.target.nextElementSibling; if (layer) { layer.scrollTop = e.target.scrollTop; layer.scrollLeft = e.target.scrollLeft; } },
+        getSeverityText: function(s) { return { error: '错误', warning: '警告', info: '建议' }[s] || s; },
+        setFilterSeverity: function(sev) { this.filterSeverity = sev === this.filterSeverity ? '' : sev; },
+        loadSample: function() { this.codeContent = this.language === 'java' ? SAMPLE_JAVA : SAMPLE_MYSQL; this.singleResult = null; },
         analyzeCode: function() {
-          var self = this
-          if (!this.codeContent.trim()) return
-          this.analyzing = true
-          this.singleResult = null
-          fetch('/api/code-review', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: this.codeContent, language: this.language })
-          })
-          .then(function(res) { return res.json() })
-          .then(function(data) { self.singleResult = data })
-          .catch(function() { self.$message && self.$message.error('扫描失败') })
-          .finally(function() { self.analyzing = false })
+          var self = this;
+          if (!this.codeContent.trim()) return;
+          this.analyzing = true; this.singleResult = null; this.filterSeverity = '';
+          fetch('/api/code-review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: this.codeContent, language: this.language }) })
+            .then(function(res) { return res.json(); })
+            .then(function(data) { self.singleResult = data; })
+            .catch(function() { self.$message && self.$message.error('扫描失败'); })
+            .finally(function() { self.analyzing = false; });
         },
-        selectFolder: function() {
-          this.$refs.folderInput.click()
-        },
+        selectFolder: function() { this.$refs.folderInput.click(); },
         handleFolderSelect: function(e) {
-          var self = this
-          var files = e.target.files
-          if (!files || files.length === 0) return
-          this.fileList = []
-          this.results = {}
-          this.selectedFile = null
-          this.scannedCount = 0
-          this.filePage = 1
-          
+          var self = this; var files = e.target.files;
+          if (!files || files.length === 0) return;
+          this.fileList = []; this.results = {}; this.selectedFile = null; this.scannedCount = 0; this.filePage = 1; this.filterSeverity = '';
           for (var i = 0; i < files.length; i++) {
             (function(file) {
-              var ext = file.name.split('.').pop()
-              ext = ext ? ext.toLowerCase() : ''
+              var ext = (file.name.split('.').pop() || '').toLowerCase();
               if (ext === 'java' || ext === 'sql') {
-                file.text().then(function(content) {
-                  self.fileList.push({ 
-                    path: file.webkitRelativePath || file.name, 
-                    name: file.name, 
-                    content: content 
-                  })
-                  if (self.fileList.length === 1) {
-                    self.selectedFile = self.fileList[0].path
-                  }
-                })
+                file.text().then(function(content) { self.fileList.push({ path: file.webkitRelativePath || file.name, name: file.name, content: content }); if (self.fileList.length === 1) self.selectedFile = self.fileList[0].path; });
               }
-            })(files[i])
+            })(files[i]);
           }
         },
-        selectFile: function(file) {
-          this.selectedFile = file.path
-        },
+        selectFile: function(file) { this.selectedFile = file.path; },
         loadFolderSample: function() {
-          this.fileList = SAMPLE_FILES.map(function(f) {
-            return {
-              path: f.path,
-              name: f.name,
-              content: f.content
-            }
-          })
-          this.results = {}
-          this.selectedFile = this.fileList[0] ? this.fileList[0].path : null
-          this.scannedCount = 0
-          this.filePage = 1
-          this.$message.success('已加载示例文件')
+          this.fileList = SAMPLE_FILES.map(function(f) { return { path: f.path, name: f.name, content: f.content }; });
+          this.results = {}; this.selectedFile = this.fileList[0] ? this.fileList[0].path : null; this.scannedCount = 0; this.filePage = 1; this.filterSeverity = '';
+          this.$message.success('已加载示例文件');
         },
         analyzeAll: function() {
-          var self = this
-          if (this.fileList.length === 0) return
-          this.analyzing = true
-          this.scannedCount = 0
-          var total = this.fileList.length
-          var done = 0
-          
+          var self = this;
+          if (this.fileList.length === 0) return;
+          this.analyzing = true; this.scannedCount = 0; this.filterSeverity = '';
+          var total = this.fileList.length, done = 0;
           this.fileList.forEach(function(file) {
-            var lang = file.name.endsWith('.sql') ? 'mysql' : 'java'
-            fetch('/api/code-review', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code: file.content, language: lang })
-            })
-            .then(function(res) { return res.json() })
-            .then(function(data) {
-              self.$set(self.results, file.path, { 
-                issues: data.issues || [], 
-                summary: data.summary || {},
-                total: data.summary ? data.summary.total : 0
-              })
-            })
-            .catch(function() {
-              self.$set(self.results, file.path, { issues: [], summary: {}, total: 0 })
-            })
-            .finally(function() {
-              done++
-              self.scannedCount = done
-              if (done === total) {
-                self.analyzing = false
-              }
-            })
-          })
+            var lang = file.name.endsWith('.sql') ? 'mysql' : 'java';
+            fetch('/api/code-review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: file.content, language: lang }) })
+              .then(function(res) { return res.json(); })
+              .then(function(data) { self.$set(self.results, file.path, { issues: data.issues || [], summary: data.summary || {}, total: data.summary ? data.summary.total : 0 }); })
+              .catch(function() { self.$set(self.results, file.path, { issues: [], summary: {}, total: 0 }); })
+              .finally(function() { done++; self.scannedCount = done; if (done === total) self.analyzing = false; });
+          });
         },
-        filePageChange: function(page) { this.filePage = page },
-        resultPageChange: function(page) { this.resultPage = page }
+        filePageChange: function(p) { this.filePage = p; },
+        resultPageChange: function(p) { this.resultPage = p; },
+        codeResultPageChange: function(p) { this.codeResultPage = p; }
       }
     })
   </script>
