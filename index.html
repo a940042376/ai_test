@@ -80,7 +80,7 @@
     .category-tag.security { background: #fef0f0; color: #f56c6c; }
     .category-tag.performance { background: #fdf6ec; color: #e6a23c; }
     .category-tag.norms { background: #ecf5ff; color: #409eff; }
-  </style>
+    .category-tag.runtime { background: #fef0f0; color: #f56c6c; }
 </head>
 <body>
   <div id="app">
@@ -462,7 +462,7 @@ INSERT INTO users VALUES (1, 'Tom', 'tom@email.com');`;
           return map[severity] || severity
         },
         getCategoryText(category) {
-          const map = { security: '安全', performance: '性能', 'best-practice': '实践', norms: '规范' }
+          const map = { security: '安全', performance: '性能', 'best-practice': '实践', norms: '规范', runtime: '运行时' }
           return map[category] || category
         }
       }
