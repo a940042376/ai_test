@@ -22,11 +22,22 @@ interface Issue {
 
 // 一、命名风格
 const NAMING_RULES = [
+  // 【强制】变量名不能以大写开头
+  {
+    pattern: /\b(int|long|double|float|String|boolean|Integer|Long|Double|Byte|List|Map|Set)\s+[A-Z][A-Za-z0-9]*\s*[=;]/g,
+    severity: 'error',
+    category: 'norms',
+    message: '命名规范：变量名不能以大写开头',
+    suggestion: 'Java变量命名应使用小写字母开头（camelCase）',
+    beforeCode: `int Number = 10; String Name = "Tom";`,
+    afterCode: `int number = 10; String name = "Tom";`,
+  },
   // 【强制】变量、方法命名不能以_或$开头结尾
   {
     pattern: /\b[_\$]+\w+|\w+[_\$]+\b/g,
     severity: 'error',
-    message: '命名风格：变量名不能以_或$开头或结尾',
+    category: 'norms',
+    message: '命名规范：变量名不能以_或$开头或结尾',
     suggestion: '遵循阿里规范：命名不能以下划线或美元符号开头或结尾',
     beforeCode: `int _count = 0; String name$ = "test";`,
     afterCode: `int count = 0; String name = "test";`,
